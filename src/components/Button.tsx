@@ -15,10 +15,10 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   children,
 }) => {
-  const baseClasses = 'medbai-button';
-  const variantClass = `medbai-button--${variant}`;
-  const sizeClass = `medbai-button--${size}`;
-  const disabledClass = disabled ? 'medbai-button--disabled' : '';
+  const baseClasses = 'exbrain-button';
+  const variantClass = `exbrain-button--${variant}`;
+  const sizeClass = `exbrain-button--${size}`;
+  const disabledClass = disabled ? 'exbrain-button--disabled' : '';
 
   const classes = [
     baseClasses,
@@ -35,7 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
       onClick={onClick}
     >
-      {loading && <div className="medbai-spinner medbai-spinner--small" />}
+      {loading && <div className="exbrain-spinner exbrain-spinner--small" />}
       {children}
     </button>
   );

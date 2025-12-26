@@ -1,4 +1,4 @@
-# @medbai/common-react
+# @exbrain/common-react
 
 Shared React components, utilities, and styles for React projects.
 
@@ -14,7 +14,7 @@ This package provides a comprehensive design system and shared components for Re
 ## Installation
 
 ```bash
-npm install @medbai/common-react
+npm install @exbrain/common-react
 ```
 
 ## Usage
@@ -24,14 +24,14 @@ npm install @medbai/common-react
 Import the main stylesheet in your application:
 
 ```tsx
-import '@medbai/common-react/dist/common-react.css';
+import '@exbrain/common-react/dist/common-react.css';
 ```
 
 ### Using Components
 
 ```tsx
 import React from 'react';
-import { Button, Input, StatusBanner, Table } from '@medbai/common-react';
+import { Button, Input, StatusBanner, Table } from '@exbrain/common-react';
 
 function MyComponent() {
   return (
@@ -55,7 +55,7 @@ function MyComponent() {
 ### Using Utilities
 
 ```tsx
-import { logger, sanitizeName, sanitizeTitle } from '@medbai/common-react';
+import { logger, sanitizeName, sanitizeTitle } from '@exbrain/common-react';
 
 // Logging
 logger.info('User action', { userId: 123, action: 'login' });
@@ -73,11 +73,11 @@ The design system uses CSS custom properties for consistent theming:
 
 ```css
 :root {
-  --medbai-primary: #007bff;
-  --medbai-secondary: #6c757d;
-  --medbai-success: #28a745;
-  --medbai-warning: #ffc107;
-  --medbai-danger: #dc3545;
+  --exbrain-primary: #007bff;
+  --exbrain-secondary: #6c757d;
+  --exbrain-success: #28a745;
+  --exbrain-warning: #ffc107;
+  --exbrain-danger: #dc3545;
   /* ... and many more */
 }
 ```
@@ -200,7 +200,7 @@ A specialized table for displaying user statistics:
 Structured logging utility:
 
 ```tsx
-import { logger } from '@medbai/common-react';
+import { logger } from '@exbrain/common-react';
 
 logger.debug('Debug message', { context: 'data' });
 logger.info('Info message');
@@ -213,7 +213,7 @@ logger.error('Error message', { error: 'details' });
 Input sanitization utilities:
 
 ```tsx
-import { sanitizeName, sanitizeTitle, sanitizeString, sanitizeHTML } from '@medbai/common-react';
+import { sanitizeName, sanitizeTitle, sanitizeString, sanitizeHTML } from '@exbrain/common-react';
 
 const cleanName = sanitizeName(userInput);
 const cleanTitle = sanitizeTitle(userTitle);

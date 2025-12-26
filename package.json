@@ -1,5 +1,5 @@
 {
-  "name": "@medbai/common-react",
+  "name": "@exbrain/common-react",
   "version": "1.0.0",
   "description": "Shared React components, utilities, and styles for React projects",
   "main": "dist/index.js",

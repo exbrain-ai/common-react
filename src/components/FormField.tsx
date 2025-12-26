@@ -28,11 +28,11 @@ export const FormField: React.FC<FormFieldComponentProps> = ({
   const actualHelpId = helpId || `${id}-help`;
 
   return (
-    <div className="medbai-form-group">
+    <div className="exbrain-form-group">
       <label
         htmlFor={id}
         id={labelId}
-        className={`medbai-form-label ${required ? 'medbai-form-label--required' : ''}`}
+        className={`exbrain-form-label ${required ? 'exbrain-form-label--required' : ''}`}
       >
         {label}
       </label>
@@ -40,7 +40,7 @@ export const FormField: React.FC<FormFieldComponentProps> = ({
       {error && (
         <div
           id={actualErrorId}
-          className="medbai-form-error"
+          className="exbrain-form-error"
           role="alert"
           aria-live="polite"
         >
@@ -48,7 +48,7 @@ export const FormField: React.FC<FormFieldComponentProps> = ({
         </div>
       )}
       {help && !error && (
-        <div id={actualHelpId} className="medbai-form-help">
+        <div id={actualHelpId} className="exbrain-form-help">
           {help}
         </div>
       )}

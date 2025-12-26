@@ -31,8 +31,8 @@ export const Input: React.FC<InputProps> = ({
   ...fieldProps
 }) => {
   const inputClasses = [
-    'medbai-form-input',
-    error ? 'medbai-form-input--error' : '',
+    'exbrain-form-input',
+    error ? 'exbrain-form-input--error' : '',
   ].filter(Boolean).join(' ');
 
   return (

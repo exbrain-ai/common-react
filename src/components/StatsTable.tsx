@@ -45,11 +45,11 @@ export const StatsTable: React.FC<StatsTableProps> = ({ data, className = '' }) 
       render: (value, row) => (
         <div>
           {row.title && (
-            <span className="medbai-text-muted" style={{ marginRight: '4px' }}>
+            <span className="exbrain-text-muted" style={{ marginRight: '4px' }}>
               {row.title}
             </span>
           )}
-          <span className="medbai-text-primary">{row.name}</span>
+          <span className="exbrain-text-primary">{row.name}</span>
         </div>
       ),
     },
@@ -57,7 +57,7 @@ export const StatsTable: React.FC<StatsTableProps> = ({ data, className = '' }) 
       key: 'count',
       label: 'Count',
       render: (value) => (
-        <div className="medbai-text-center" style={{ fontWeight: '600', color: 'var(--medbai-primary)' }}>
+        <div className="exbrain-text-center" style={{ fontWeight: '600', color: 'var(--exbrain-primary)' }}>
           {value}
         </div>
       ),
@@ -66,7 +66,7 @@ export const StatsTable: React.FC<StatsTableProps> = ({ data, className = '' }) 
       key: 'lastHelloAt',
       label: 'Last Hello At',
       render: (value) => (
-        <div className="medbai-text-muted" style={{ fontSize: 'var(--medbai-font-size-sm)' }}>
+        <div className="exbrain-text-muted" style={{ fontSize: 'var(--exbrain-font-size-sm)' }}>
           {formatTimestamp(value)}
         </div>
       ),

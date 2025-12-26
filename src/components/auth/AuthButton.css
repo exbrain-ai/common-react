@@ -30,20 +30,20 @@
 .auth-button__user-name {
   font-weight: 500;
   font-size: 0.875rem;
-  color: var(--medbai-text-primary, #333);
+  color: var(--exbrain-text-primary, #333);
 }
 
 .auth-button__user-email {
   font-size: 0.75rem;
-  color: var(--medbai-text-secondary, #666);
+  color: var(--exbrain-text-secondary, #666);
 }
 
 .auth-button__login,
 .auth-button__logout {
   padding: 0.5rem 1rem;
-  border: 1px solid var(--medbai-border, #ddd);
+  border: 1px solid var(--exbrain-border, #ddd);
   border-radius: 4px;
-  background-color: var(--medbai-primary, #007bff);
+  background-color: var(--exbrain-primary, #007bff);
   color: white;
   font-size: 0.875rem;
   cursor: pointer;
@@ -52,14 +52,14 @@
 
 .auth-button__login:hover,
 .auth-button__logout:hover {
-  background-color: var(--medbai-primary-hover, #0056b3);
+  background-color: var(--exbrain-primary-hover, #0056b3);
 }
 
 .auth-button__logout {
-  background-color: var(--medbai-secondary, #6c757d);
+  background-color: var(--exbrain-secondary, #6c757d);
 }
 
 .auth-button__logout:hover {
-  background-color: var(--medbai-secondary-hover, #5a6268);
+  background-color: var(--exbrain-secondary-hover, #5a6268);
 }
 

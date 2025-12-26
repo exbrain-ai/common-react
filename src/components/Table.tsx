@@ -51,9 +51,9 @@ export const Table = <T extends Record<string, any>>({
 
   if (loading) {
     return (
-      <div className={`medbai-table-container ${className}`}>
-        <div className="medbai-table-empty">
-          <div className="medbai-spinner" />
+      <div className={`exbrain-table-container ${className}`}>
+        <div className="exbrain-table-empty">
+          <div className="exbrain-spinner" />
           <span style={{ marginLeft: '8px' }}>Loading...</span>
         </div>
       </div>
@@ -62,22 +62,22 @@ export const Table = <T extends Record<string, any>>({
 
   if (sortedData.length === 0) {
     return (
-      <div className={`medbai-table-container ${className}`}>
-        <div className="medbai-table-empty">{emptyMessage}</div>
+      <div className={`exbrain-table-container ${className}`}>
+        <div className="exbrain-table-empty">{emptyMessage}</div>
       </div>
     );
   }
 
   return (
-    <div className={`medbai-table-container ${className}`}>
-      <table className="medbai-table">
+    <div className={`exbrain-table-container ${className}`}>
+      <table className="exbrain-table">
         <thead>
           <tr>
             {columns.map((column) => (
               <th
                 key={String(column.key)}
-                className={`medbai-table-header ${
-                  column.sortable ? 'medbai-table-header--sortable' : ''
+                className={`exbrain-table-header ${
+                  column.sortable ? 'exbrain-table-header--sortable' : ''
                 } ${column.className || ''}`}
                 onClick={() => column.sortable && handleSort(String(column.key))}
               >
@@ -93,11 +93,11 @@ export const Table = <T extends Record<string, any>>({
         </thead>
         <tbody>
           {sortedData.map((row, index) => (
-            <tr key={index} className="medbai-table-row">
+            <tr key={index} className="exbrain-table-row">
               {columns.map((column) => (
                 <td
                   key={String(column.key)}
-                  className={`medbai-table-cell ${column.className || ''}`}
+                  className={`exbrain-table-cell ${column.className || ''}`}
                 >
                   {renderCell(column, row)}
                 </td>

@@ -96,7 +96,7 @@ libraries:
   - name: "@auth0/auth0-react"
     version: "^2.0.0"
     category: Authentication
-    description: Official Auth0 React SDK (wrapped by @medbai/common-react)
+    description: Official Auth0 React SDK (wrapped by @exbrain/common-react)
 
 
 

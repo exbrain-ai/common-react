@@ -76,7 +76,7 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
   const isDisabled = disabled || loading;
 
   return (
-    <form onSubmit={handleSubmit} className={`medbai-form ${className}`}>
+    <form onSubmit={handleSubmit} className={`exbrain-form ${className}`}>
       <Input
         id="name"
         label="Name"
@@ -102,7 +102,7 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
         type="submit"
         disabled={isDisabled}
         loading={loading}
-        className="medbai-button--primary"
+        className="exbrain-button--primary"
       >
         {loading ? 'Submitting...' : 'Submit'}
       </Button>
