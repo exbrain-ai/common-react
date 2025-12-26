@@ -1,0 +1,342 @@
+/* Design System - Component Styles */
+
+/* Button Component */
+.medbai-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--medbai-spacing-sm);
+  padding: var(--medbai-spacing-sm) var(--medbai-spacing-md);
+  font-size: var(--medbai-font-size-base);
+  font-weight: var(--medbai-font-weight-medium);
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--medbai-radius-md);
+  cursor: pointer;
+  transition: all var(--medbai-transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.medbai-button:focus {
+  outline: 2px solid var(--medbai-primary);
+  outline-offset: 2px;
+}
+
+.medbai-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Button Variants */
+.medbai-button--primary {
+  background-color: var(--medbai-primary);
+  color: var(--medbai-text-inverse);
+  border-color: var(--medbai-primary);
+}
+
+.medbai-button--primary:hover:not(:disabled) {
+  background-color: var(--medbai-primary-hover);
+  border-color: var(--medbai-primary-hover);
+}
+
+.medbai-button--secondary {
+  background-color: var(--medbai-white);
+  color: var(--medbai-text-primary);
+  border-color: var(--medbai-border-medium);
+}
+
+.medbai-button--secondary:hover:not(:disabled) {
+  background-color: var(--medbai-gray-50);
+  border-color: var(--medbai-gray-400);
+}
+
+.medbai-button--danger {
+  background-color: var(--medbai-danger);
+  color: var(--medbai-text-inverse);
+  border-color: var(--medbai-danger);
+}
+
+.medbai-button--danger:hover:not(:disabled) {
+  background-color: var(--medbai-danger-hover);
+  border-color: var(--medbai-danger-hover);
+}
+
+.medbai-button--warning {
+  background-color: var(--medbai-warning);
+  color: var(--medbai-text-primary);
+  border-color: var(--medbai-warning);
+}
+
+.medbai-button--warning:hover:not(:disabled) {
+  background-color: var(--medbai-warning-hover);
+  border-color: var(--medbai-warning-hover);
+}
+
+/* Button Sizes */
+.medbai-button--small {
+  padding: var(--medbai-spacing-xs) var(--medbai-spacing-sm);
+  font-size: var(--medbai-font-size-sm);
+}
+
+.medbai-button--large {
+  padding: var(--medbai-spacing-md) var(--medbai-spacing-lg);
+  font-size: var(--medbai-font-size-lg);
+}
+
+/* Form Components */
+.medbai-form-group {
+  margin-bottom: var(--medbai-spacing-md);
+}
+
+.medbai-form-label {
+  display: block;
+  margin-bottom: var(--medbai-spacing-xs);
+  font-weight: var(--medbai-font-weight-medium);
+  color: var(--medbai-text-primary);
+}
+
+.medbai-form-label--required::after {
+  content: ' *';
+  color: var(--medbai-danger);
+}
+
+.medbai-form-input {
+  display: block;
+  width: 100%;
+  padding: var(--medbai-spacing-sm) var(--medbai-spacing-md);
+  font-size: var(--medbai-font-size-base);
+  line-height: var(--medbai-line-height-normal);
+  color: var(--medbai-text-primary);
+  background-color: var(--medbai-white);
+  border: 1px solid var(--medbai-border-medium);
+  border-radius: var(--medbai-radius-md);
+  transition: border-color var(--medbai-transition-fast), box-shadow var(--medbai-transition-fast);
+}
+
+.medbai-form-input:focus {
+  outline: none;
+  border-color: var(--medbai-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.medbai-form-input:disabled {
+  background-color: var(--medbai-gray-50);
+  cursor: not-allowed;
+}
+
+.medbai-form-input--error {
+  border-color: var(--medbai-danger);
+}
+
+.medbai-form-input--error:focus {
+  border-color: var(--medbai-danger);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.medbai-form-error {
+  display: block;
+  margin-top: var(--medbai-spacing-xs);
+  font-size: var(--medbai-font-size-sm);
+  color: var(--medbai-danger);
+}
+
+.medbai-form-help {
+  display: block;
+  margin-top: var(--medbai-spacing-xs);
+  font-size: var(--medbai-font-size-sm);
+  color: var(--medbai-text-secondary);
+}
+
+/* Status Banner Component */
+.medbai-status-banner {
+  padding: var(--medbai-spacing-sm) var(--medbai-spacing-md);
+  margin: 0;
+  border: 1px solid;
+  border-radius: 0;
+}
+
+.medbai-status-banner--info {
+  background-color: var(--medbai-info-light);
+  border-color: var(--medbai-info);
+  color: var(--medbai-info-hover);
+}
+
+.medbai-status-banner--warning {
+  background-color: var(--medbai-warning-light);
+  border-color: var(--medbai-warning);
+  color: var(--medbai-warning-hover);
+}
+
+.medbai-status-banner--error {
+  background-color: var(--medbai-danger-light);
+  border-color: var(--medbai-danger);
+  color: var(--medbai-danger-hover);
+}
+
+.medbai-status-banner--success {
+  background-color: var(--medbai-success-light);
+  border-color: var(--medbai-success);
+  color: var(--medbai-success-hover);
+}
+
+.medbai-status-banner-content {
+  display: flex;
+  align-items: center;
+  gap: var(--medbai-spacing-sm);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.medbai-status-banner-icon {
+  font-size: var(--medbai-font-size-lg);
+  flex-shrink: 0;
+}
+
+.medbai-status-banner-message {
+  flex: 1;
+  font-weight: var(--medbai-font-weight-medium);
+}
+
+.medbai-status-banner-actions {
+  display: flex;
+  gap: var(--medbai-spacing-sm);
+  flex-shrink: 0;
+}
+
+/* Table Component */
+.medbai-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--medbai-white);
+  border-radius: var(--medbai-radius-md);
+  overflow: hidden;
+  box-shadow: var(--medbai-shadow-sm);
+}
+
+.medbai-table-header {
+  background-color: var(--medbai-gray-50);
+  font-weight: var(--medbai-font-weight-semibold);
+  color: var(--medbai-text-primary);
+  text-align: left;
+  padding: var(--medbai-spacing-sm) var(--medbai-spacing-md);
+  border-bottom: 2px solid var(--medbai-border-light);
+  font-size: var(--medbai-font-size-sm);
+}
+
+.medbai-table-header--sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--medbai-transition-fast);
+}
+
+.medbai-table-header--sortable:hover {
+  background-color: var(--medbai-gray-100);
+}
+
+.medbai-table-row {
+  border-bottom: 1px solid var(--medbai-border-light);
+  transition: background-color var(--medbai-transition-fast);
+}
+
+.medbai-table-row:hover {
+  background-color: var(--medbai-gray-50);
+}
+
+.medbai-table-cell {
+  padding: var(--medbai-spacing-sm) var(--medbai-spacing-md);
+  vertical-align: top;
+  font-size: var(--medbai-font-size-sm);
+}
+
+.medbai-table-empty {
+  text-align: center;
+  color: var(--medbai-text-secondary);
+  font-style: italic;
+  padding: var(--medbai-spacing-xl);
+  background-color: var(--medbai-white);
+}
+
+/* Card Component */
+.medbai-card {
+  background-color: var(--medbai-white);
+  border-radius: var(--medbai-radius-lg);
+  box-shadow: var(--medbai-shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--medbai-transition-fast);
+}
+
+.medbai-card:hover {
+  box-shadow: var(--medbai-shadow-md);
+}
+
+.medbai-card-header {
+  padding: var(--medbai-spacing-md) var(--medbai-spacing-lg);
+  border-bottom: 1px solid var(--medbai-border-light);
+  background-color: var(--medbai-gray-50);
+}
+
+.medbai-card-title {
+  margin: 0;
+  font-size: var(--medbai-font-size-lg);
+  font-weight: var(--medbai-font-weight-semibold);
+  color: var(--medbai-text-primary);
+}
+
+.medbai-card-body {
+  padding: var(--medbai-spacing-lg);
+}
+
+.medbai-card-footer {
+  padding: var(--medbai-spacing-md) var(--medbai-spacing-lg);
+  border-top: 1px solid var(--medbai-border-light);
+  background-color: var(--medbai-gray-50);
+}
+
+/* Loading Spinner */
+.medbai-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--medbai-border-light);
+  border-top: 2px solid var(--medbai-primary);
+  border-radius: 50%;
+  animation: medbai-spin 1s linear infinite;
+}
+
+.medbai-spinner--small {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.medbai-spinner--large {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+@keyframes medbai-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .medbai-status-banner-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--medbai-spacing-sm);
+  }
+  
+  .medbai-table {
+    font-size: var(--medbai-font-size-xs);
+  }
+  
+  .medbai-table-header,
+  .medbai-table-cell {
+    padding: var(--medbai-spacing-xs) var(--medbai-spacing-sm);
+  }
+}
+
+

@@ -1,0 +1,109 @@
+# Approved React Libraries
+# This is the source of truth for approved libraries - scripts parse this file
+# The markdown file (library-standards.mdc) is documentation that references this
+
+libraries:
+  # Core React & TypeScript
+  - name: react
+    version: v18.2.0
+    category: Core React & TypeScript
+    description: React library
+  
+  - name: react-dom
+    version: v18.2.0
+    category: Core React & TypeScript
+    description: React DOM rendering
+  
+  - name: typescript
+    version: v4.9.5
+    category: Core React & TypeScript
+    description: TypeScript compiler
+  
+  - name: "@types/react"
+    version: v18.2.0
+    category: Core React & TypeScript
+    description: React TypeScript definitions
+  
+  - name: "@types/react-dom"
+    version: v18.2.0
+    category: Core React & TypeScript
+    description: React DOM TypeScript definitions
+  
+  - name: "@types/node"
+    version: v20.19.0
+    category: Core React & TypeScript
+    description: Node.js TypeScript definitions
+
+  # Build Tools & Development
+  - name: vite
+    version: v7.1.6
+    category: Build Tools & Development
+    description: Build tool and dev server
+  
+  - name: "@vitejs/plugin-react"
+    version: v5.0.3
+    category: Build Tools & Development
+    description: Vite React plugin
+  
+  - name: vitest
+    version: v3.2.4
+    category: Build Tools & Development
+    description: Testing framework
+  
+  - name: "@vitest/ui"
+    version: v3.2.4
+    category: Build Tools & Development
+    description: Vitest UI
+  
+  - name: "@vitest/coverage-v8"
+    version: v3.2.4
+    category: Build Tools & Development
+    description: Coverage reporting
+
+  # Testing & Quality
+  - name: "@testing-library/react"
+    version: v13.4.0
+    category: Testing & Quality
+    description: React testing utilities
+  
+  - name: "@testing-library/dom"
+    version: v10.4.1
+    category: Testing & Quality
+    description: DOM testing utilities
+  
+  - name: "@testing-library/jest-dom"
+    version: v6.8.0
+    category: Testing & Quality
+    description: Jest DOM matchers
+  
+  - name: "@testing-library/user-event"
+    version: v13.5.0
+    category: Testing & Quality
+    description: User interaction testing
+  
+  - name: "@types/jest"
+    version: v27.5.2
+    category: Testing & Quality
+    description: Jest TypeScript definitions
+
+  # Performance & Monitoring
+  - name: web-vitals
+    version: v2.1.4
+    category: Performance & Monitoring
+    description: Web performance metrics
+
+  # Authentication
+  - name: "@auth0/auth0-react"
+    version: "^2.0.0"
+    category: Authentication
+    description: Official Auth0 React SDK (wrapped by @medbai/common-react)
+
+
+
+
+
+
+
+
+
+

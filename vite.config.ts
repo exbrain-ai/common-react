@@ -1,0 +1,42 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    lib: {
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'ReactCommon',
+      formats: ['es', 'cjs'],
+      fileName: (format) => `index.${format === 'es' ? 'esm' : format}.js`,
+    },
+    rollupOptions: {
+      external: ['react', 'react-dom', 'react/jsx-runtime', '@auth0/auth0-react'],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          'react/jsx-runtime': 'React',
+        },
+        assetFileNames: (assetInfo) => {
+          // Rename CSS file to match package name
+          if (assetInfo.name === 'style.css') {
+            return 'common-react.css';
+          }
+          return assetInfo.name || 'assets/[name][extname]';
+        },
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+  },
+});
