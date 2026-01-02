@@ -35,6 +35,12 @@ libraries:
     description: Node.js TypeScript definitions
 
   # Build Tools & Development
+  - name: next
+    version: v16.0.10
+    category: Build Tools & Development
+    description: Next.js 16 App Router framework (for Next.js migration feature)
+    justification: Required for Next.js migration feature. Next.js 16 App Router provides server-side rendering, file-based routing, and modern React patterns. This is the core framework for the migration from Vite SPA to Next.js. Version 16.0.10 is the latest patched version that fixes CVE-2025-66478 security vulnerability in 16.0.0.
+  
   - name: vite
     version: v7.1.6
     category: Build Tools & Development
