@@ -21,6 +21,7 @@ export { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 // Export all utilities
 export { default as logger } from './utils/logger';
+export type { Logger, LogLevel } from './utils/logger';
 export * from './utils/sanitizer';
 
 // Export Auth0 service

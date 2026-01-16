@@ -12,6 +12,11 @@
       "require": "./dist/index.cjs.js",
       "types": "./dist/index.d.ts"
     },
+    "./logger": {
+      "import": "./dist/logger.esm.js",
+      "require": "./dist/logger.cjs.js",
+      "types": "./dist/logger.d.ts"
+    },
     "./styles/index.css": "./dist/styles/index.css",
     "./styles/*": "./dist/styles/*"
   },
@@ -31,9 +36,9 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
+    "@auth0/auth0-react": "^2.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@auth0/auth0-react": "^2.0.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@auth0/auth0-react": "^2.0.0",
@@ -48,6 +53,7 @@
     "@vitejs/plugin-react": "^5.0.3",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
+    "pino-pretty": "^13.1.3",
     "typescript": "^4.9.5",
     "vite": "^7.1.6",
     "vitest": "^3.2.4"
@@ -59,5 +65,8 @@
     "utilities"
   ],
   "author": "Company Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "pino": "^10.2.0"
+  }
 }

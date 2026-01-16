@@ -1,92 +1,333 @@
 /**
- * Frontend logging utility
- * Provides structured logging with different levels
+ * Structured Logger using Pino
+ * 
+ * Provides high-performance structured logging for both browser and server contexts.
+ * Outputs JSON logs compatible with Loki log aggregation.
+ * 
+ * Supports:
+ * - Next.js: NEXT_PUBLIC_LOG_LEVEL environment variable
+ * - React/Vite: REACT_APP_LOG_LEVEL environment variable (backward compatibility)
+ * - Automatic detection of browser vs server context
+ * - Configurable log levels: 'debug' | 'info' | 'warn' | 'error'
+ * - Client-side log shipping to /api/logs endpoint in production
  */
+
+import pino from 'pino';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-export interface LogEntry {
-  level: LogLevel;
-  message: string;
-  timestamp: string;
-  context?: Record<string, unknown>;
-}
+/**
+ * Detect if we're running in a browser environment
+ */
+const isBrowser = typeof window !== 'undefined';
 
-class Logger {
-  private level: LogLevel;
-  private isDevelopment: boolean;
+/**
+ * Client-side log batching and shipping
+ * Batches logs and sends them to /api/logs endpoint for aggregation
+ */
+class ClientLogShipper {
+  private logQueue: Array<{
+    level: LogLevel;
+    message: string;
+    context?: Record<string, unknown>;
+    timestamp: string;
+  }> = [];
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly BATCH_SIZE = 10;
+  private readonly FLUSH_INTERVAL_MS = 5000; // 5 seconds
+  private readonly LOG_ENDPOINT = '/api/logs';
 
-  constructor(level: LogLevel = 'info', isDevelopment: boolean = false) {
-    this.level = level;
-    this.isDevelopment = isDevelopment;
-  }
-
-  private shouldLog(level: LogLevel): boolean {
-    const levels: Record<LogLevel, number> = {
-      debug: 0,
-      info: 1,
-      warn: 2,
-      error: 3,
-    };
-    return levels[level] >= levels[this.level];
-  }
-
-  private formatMessage(level: LogLevel, message: string, context?: Record<string, unknown>): string {
-    const timestamp = new Date().toISOString();
-    const logEntry: LogEntry = {
+  /**
+   * Add log to queue and schedule flush if needed
+   */
+  addLog(level: LogLevel, message: string, context?: Record<string, unknown>): void {
+    this.logQueue.push({
       level,
       message,
-      timestamp,
       context,
-    };
+      timestamp: new Date().toISOString(),
+    });
 
-    if (this.isDevelopment) {
-      // In development, use console methods for better debugging
-      const consoleMethod = level === 'debug' ? 'log' : level;
-      const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
-      console[consoleMethod](`${prefix} ${message}`, context || '');
-      return message;
+    // Flush immediately if batch size reached
+    if (this.logQueue.length >= this.BATCH_SIZE) {
+      this.flush();
+    } else if (!this.flushTimer) {
+      // Schedule flush after interval
+      this.flushTimer = setTimeout(() => {
+        this.flush();
+      }, this.FLUSH_INTERVAL_MS);
+    }
+  }
+
+  /**
+   * Flush logs to backend endpoint (fire-and-forget)
+   */
+  private async flush(): Promise<void> {
+    if (this.logQueue.length === 0) {
+      return;
     }
 
-    // In production, return structured JSON for log aggregation
-    return JSON.stringify(logEntry);
+    // Clear timer
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+
+    // Get current batch
+    const batch = [...this.logQueue];
+    this.logQueue = [];
+
+    // Get request ID from cookie for correlation
+    const requestId = this.getRequestIdFromCookie();
+
+    try {
+      // Send to backend endpoint (fire-and-forget)
+      // Use sendBeacon for reliability (works even if page is unloading)
+      const payload = JSON.stringify({
+        logs: batch,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+      });
+
+      // Try sendBeacon first (more reliable, works during page unload)
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(this.LOG_ENDPOINT, blob);
+      } else {
+        // Fallback to fetch (may fail during page unload)
+        fetch(this.LOG_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(requestId && { 'X-Request-ID': requestId }),
+          },
+          body: payload,
+          keepalive: true, // Keep request alive even if page unloads
+        }).catch(() => {
+          // Silently fail - logging should never break the app
+        });
+      }
+    } catch (error) {
+      // Silently fail - logging should never break the app
+      // Logs are already in console, so we don't lose them
+    }
+  }
+
+  /**
+   * Get request ID from cookie for correlation
+   */
+  private getRequestIdFromCookie(): string | null {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'x-request-id') {
+        return decodeURIComponent(value);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Force flush remaining logs (call on page unload)
+   */
+  forceFlush(): void {
+    if (this.logQueue.length > 0) {
+      // Use sendBeacon for immediate flush (works during page unload)
+      this.flush();
+    }
+  }
+}
+
+// Create singleton log shipper for client-side (lazy initialization)
+let logShipper: ClientLogShipper | null = null;
+
+/**
+ * Get or create log shipper instance (lazy initialization)
+ * Only creates instance when actually needed (when first log is shipped)
+ */
+function getLogShipper(): ClientLogShipper | null {
+  if (!isBrowser || typeof window === 'undefined') {
+    return null;
+  }
+  
+  if (!logShipper) {
+    logShipper = new ClientLogShipper();
+    
+    // Register page unload handlers once when shipper is first created
+    window.addEventListener('beforeunload', () => {
+      logShipper?.forceFlush();
+    });
+    window.addEventListener('pagehide', () => {
+      logShipper?.forceFlush();
+    });
+  }
+  
+  return logShipper;
+}
+
+/**
+ * Get log level from environment variables
+ * Supports both Next.js (NEXT_PUBLIC_*) and React/Vite (REACT_APP_*) conventions
+ */
+function getLogLevel(): LogLevel {
+  // Next.js convention (takes precedence)
+  const nextLogLevel = process.env.NEXT_PUBLIC_LOG_LEVEL as LogLevel;
+  if (nextLogLevel && ['debug', 'info', 'warn', 'error'].includes(nextLogLevel)) {
+    return nextLogLevel;
+  }
+
+  // React/Vite convention (backward compatibility)
+  const reactLogLevel = process.env.REACT_APP_LOG_LEVEL as LogLevel;
+  if (reactLogLevel && ['debug', 'info', 'warn', 'error'].includes(reactLogLevel)) {
+    return reactLogLevel;
+  }
+
+  // Default based on environment
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  return isDevelopment ? 'debug' : 'info';
+}
+
+/**
+ * Create Pino logger instance
+ * 
+ * Browser context: Uses browser's console API with structured output
+ * - Development: Pretty-prints to console AND ships to /api/logs endpoint
+ * - Production: Outputs JSON to console AND ships to /api/logs endpoint
+ * Server context: Uses stdout with JSON output (collected by Promtail → Loki)
+ */
+function createLogger(): pino.Logger {
+  const level = getLogLevel();
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  if (isBrowser) {
+    // Browser context: Use browser console with structured JSON output
+    // In production, also ship logs to /api/logs endpoint for aggregation
+    return pino({
+      level,
+      browser: {
+        asObject: false, // Output as JSON string (not object)
+        write: (o: object) => {
+          const logEntry = typeof o === 'string' ? JSON.parse(o) : o;
+          const { level: levelNum, msg, ...context } = logEntry as { level: number; msg: string; [key: string]: unknown };
+          const levelLabel = pino.levels.labels[levelNum] || 'info';
+          const logLevel = levelLabel as LogLevel;
+
+          // Always ship logs to backend for aggregation (works in both dev and prod)
+          // Lazy initialization - only creates shipper when first log needs shipping
+          const shipper = getLogShipper();
+          if (shipper) {
+            shipper.addLog(logLevel, msg, context);
+          }
+
+          // Console output: Pretty print in development, JSON in production
+          if (isDevelopment) {
+            // Development: Pretty print for easier debugging
+            const consoleMethod = levelLabel === 'error' ? 'error' : 
+                                 levelLabel === 'warn' ? 'warn' : 
+                                 levelLabel === 'debug' ? 'log' : 'info';
+            console[consoleMethod](`[${levelLabel.toUpperCase()}] ${msg}`, context);
+          } else {
+            // Production: Output JSON string to console
+            const logString = typeof o === 'string' ? o : JSON.stringify(o);
+            console.log(logString);
+          }
+        },
+      },
+    });
+  } else {
+    // Server context: Output to stdout (collected by Promtail → Loki)
+    return pino({
+      level,
+      formatters: {
+        level: (label) => ({ level: label }),
+      },
+      timestamp: pino.stdTimeFunctions.isoTime,
+      // Output JSON to stdout (collected by Promtail → Loki)
+      // In development, can use pino-pretty transport for readability
+      ...(isDevelopment && {
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            ignore: 'pid,hostname',
+          },
+        },
+      }),
+    });
+  }
+}
+
+// Create singleton logger instance
+const logger = createLogger();
+
+/**
+ * Logger interface matching common-go logger pattern
+ * Provides consistent API across client and server
+ */
+export interface Logger {
+  debug(message: string, context?: Record<string, unknown>): void;
+  info(message: string, context?: Record<string, unknown>): void;
+  warn(message: string, context?: Record<string, unknown>): void;
+  error(message: string, context?: Record<string, unknown>): void;
+  setLevel(level: LogLevel): void;
+  getLevel(): LogLevel;
+}
+
+/**
+ * Logger wrapper that provides consistent API
+ */
+class LoggerWrapper implements Logger {
+  private pinoLogger: pino.Logger;
+
+  constructor(pinoLogger: pino.Logger) {
+    this.pinoLogger = pinoLogger;
   }
 
   debug(message: string, context?: Record<string, unknown>): void {
-    if (this.shouldLog('debug')) {
-      this.formatMessage('debug', message, context);
+    if (context) {
+      this.pinoLogger.debug(context, message);
+    } else {
+      this.pinoLogger.debug(message);
     }
   }
 
   info(message: string, context?: Record<string, unknown>): void {
-    if (this.shouldLog('info')) {
-      this.formatMessage('info', message, context);
+    if (context) {
+      this.pinoLogger.info(context, message);
+    } else {
+      this.pinoLogger.info(message);
     }
   }
 
   warn(message: string, context?: Record<string, unknown>): void {
-    if (this.shouldLog('warn')) {
-      this.formatMessage('warn', message, context);
+    if (context) {
+      this.pinoLogger.warn(context, message);
+    } else {
+      this.pinoLogger.warn(message);
     }
   }
 
   error(message: string, context?: Record<string, unknown>): void {
-    if (this.shouldLog('error')) {
-      this.formatMessage('error', message, context);
+    if (context) {
+      this.pinoLogger.error(context, message);
+    } else {
+      this.pinoLogger.error(message);
     }
   }
 
   setLevel(level: LogLevel): void {
-    this.level = level;
+    this.pinoLogger.level = level;
+  }
+
+  getLevel(): LogLevel {
+    return this.pinoLogger.level as LogLevel;
   }
 }
 
-// Create logger instance
-const logger = new Logger(
-  (process.env.REACT_APP_LOG_LEVEL as LogLevel) || 'info',
-  process.env.NODE_ENV === 'development'
-);
-
-export default logger;
-
-
+// Export wrapped logger instance
+export default new LoggerWrapper(logger);

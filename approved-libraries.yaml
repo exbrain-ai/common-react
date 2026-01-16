@@ -97,6 +97,19 @@ libraries:
     version: v2.1.4
     category: Performance & Monitoring
     description: Web performance metrics
+  
+  # Logging
+  - name: pino
+    version: "^10.0.0"
+    category: Logging
+    description: High-performance structured JSON logger for Node.js and browser
+    justification: Industry-standard structured logging library with excellent performance. Works in both server-side (Next.js API routes) and browser (React components) contexts. Outputs JSON logs compatible with Loki log aggregation. Provides async logging with minimal overhead. Pino v10+ has built-in browser support.
+  
+  - name: pino-pretty
+    version: "^13.0.0"
+    category: Logging
+    description: Pretty printer for Pino logs (development only)
+    justification: Development tool for readable log output. Used only in development mode for better debugging experience. Not included in production builds.
 
   # Authentication
   - name: "@auth0/auth0-react"
