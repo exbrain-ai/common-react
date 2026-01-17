@@ -8,13 +8,17 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
-        logger: resolve(__dirname, 'src/logger.ts'),
+        logger: resolve(__dirname, 'src/utils/logger.ts'),
+        'utils/auth-events': resolve(__dirname, 'src/utils/auth-events.ts'),
       },
       name: 'ReactCommon',
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => {
         if (entryName === 'logger') {
           return `logger.${format === 'es' ? 'esm' : format}.js`;
+        }
+        if (entryName === 'utils/auth-events') {
+          return `utils/auth-events.${format === 'es' ? 'esm' : format}.js`;
         }
         return `index.${format === 'es' ? 'esm' : format}.js`;
       },

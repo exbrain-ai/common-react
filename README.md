@@ -221,6 +221,164 @@ const cleanString = sanitizeString(anyInput);
 const cleanHTML = sanitizeHTML(htmlContent);
 ```
 
+### Path Utilities
+
+Path utilities for handling basePath in Next.js applications:
+
+```tsx
+import { getBasePath, apiUrl, appUrl, withoutBasePath, hasBasePath, getDashboardHomePath } from '@exbrain/common-react';
+
+// Get basePath from environment variable
+const basePath = getBasePath(); // Returns '/hello' if NEXT_PUBLIC_BASE_PATH is set
+
+// Add basePath to API route paths (for client-side fetch calls)
+const apiEndpoint = apiUrl('/api/auth/signup'); // Returns '/hello/api/auth/signup' if basePath is '/hello'
+
+// Add basePath to app route paths (for page navigation)
+const dashboardUrl = appUrl('/dashboard/home'); // Returns '/hello/dashboard/home' if basePath is '/hello'
+
+// Remove basePath from a path
+const normalizedPath = withoutBasePath('/hello/dashboard/home'); // Returns '/dashboard/home' if basePath is '/hello'
+
+// Check if path starts with basePath
+const hasBase = hasBasePath('/hello/dashboard'); // Returns true if basePath is '/hello'
+
+// Get default dashboard home path (with basePath)
+const homePath = getDashboardHomePath(); // Returns '/hello/dashboard/home' if basePath is '/hello'
+```
+
+**Usage Notes:**
+- Works in both server-side and client-side contexts (automatically detects `typeof window`)
+- Handles empty basePath (host development mode - returns path as-is)
+- Normalizes paths (ensures leading slash)
+- Handles edge cases: empty strings return `/`, malformed paths are normalized
+
+### Password Validator
+
+Password validation utility that matches server-side validation logic:
+
+```tsx
+import { validatePassword, validatePasswordSingleError, type PasswordPolicyConfig } from '@exbrain/common-react';
+
+// Define your app-specific password policy
+const passwordPolicy: PasswordPolicyConfig = {
+  minLength: 8,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireNumber: true,
+  requireSymbol: true,
+};
+
+// Validate password and get detailed errors
+const result = validatePassword('Password123!', passwordPolicy);
+if (result.isValid) {
+  console.log('Password is valid');
+} else {
+  console.log('Password errors:', result.errors);
+  // ['Password must be at least 8 characters long', ...]
+}
+
+// Validate password and get single error message (useful for UI display)
+const singleError = validatePasswordSingleError('weak', passwordPolicy);
+if (singleError) {
+  console.log('Password error:', singleError);
+  // 'Password must be at least 8 characters long'
+}
+```
+
+**Features:**
+- Unicode-aware validation (matches server-side Go `unicode` package logic)
+- Policy is a required parameter (no default policy in common-react - each app must provide its own)
+- Returns detailed errors or single error message
+- Supports custom policy configurations
+
+### Error Handling Utilities
+
+Authentication error mapping utilities:
+
+```tsx
+import { mapAuthError, extractAuthError, type AuthError } from '@exbrain/common-react';
+
+// Map IAM Service error codes to user-friendly messages
+const userMessage = mapAuthError('invalid_credentials');
+// Returns: 'Invalid email or password. Please check your credentials and try again.'
+
+// Map unknown error code with custom default message
+const customMessage = mapAuthError('unknown_code', 'Custom error message');
+// Returns: 'Custom error message'
+
+// Extract error from API response
+const apiResponse = {
+  error: {
+    code: 'csrf_token_invalid',
+    message: 'CSRF token is invalid',
+  },
+};
+const extracted = extractAuthError(apiResponse);
+// Returns: { code: 'csrf_token_invalid', message: 'Security token expired. Please refresh the page and try again.' }
+
+// Handle string error format
+const stringError = extractAuthError({ error: 'Network error' });
+// Returns: { code: 'unknown', message: 'Network error' }
+```
+
+**Supported Error Codes:**
+- Authentication: `invalid_credentials`, `invalid_email`, `invalid_password`
+- Signup: `user_already_exists`, `email_already_registered`
+- CSRF: `csrf_token_invalid`, `csrf_token_missing`, `csrf_token_expired`
+- Rate limiting: `rate_limit_exceeded`
+- Account: `account_locked`, `account_suspended`
+- Service: `service_unavailable`, `internal_error`
+- Network: `network_error`, `timeout`
+
+### Auth Event Logging
+
+Structured logging for authentication events:
+
+```tsx
+import { logAuthEvent, getClientIP, getUserAgent, getBrowserUserAgent, type AuthEventContext } from '@exbrain/common-react';
+
+// Log authentication event (appName is REQUIRED)
+const context: AuthEventContext = {
+  eventType: 'login_success',
+  appName: 'hello', // REQUIRED - identifies the application
+  userId: 'user-123', // Internal user ID (UUID) - safe to log
+  result: 'success',
+  endpoint: '/auth/password-login',
+  requestId: 'req-123',
+};
+logAuthEvent(context);
+
+// Log failure event
+logAuthEvent({
+  eventType: 'login_failure',
+  appName: 'hello', // REQUIRED
+  userId: 'user-123',
+  result: 'failure',
+  errorCode: 'invalid_credentials',
+  errorMessage: 'Invalid credentials',
+  endpoint: '/auth/password-login',
+});
+
+// Get client IP from headers (server-side)
+const headers = new Headers();
+headers.set('x-forwarded-for', '192.168.1.1, 10.0.0.1');
+const ip = getClientIP(headers); // Returns '192.168.1.1'
+
+// Get user agent from headers (server-side)
+const userAgent = getUserAgent(headers); // Returns user agent string
+
+// Get browser user agent (client-side only)
+const browserUA = getBrowserUserAgent(); // Returns window.navigator.userAgent
+```
+
+**Features:**
+- Structured JSON logging (compatible with Loki)
+- `appName` parameter is REQUIRED (not optional) - ensures all logs can be identified by application
+- Never logs PII (email, IP, userAgent) - only logs user_id (internal UUID)
+- Supports both server-side (Headers) and client-side (Record) usage
+- Automatic log level selection (error for failures, info for successes)
+
 ## Development
 
 ### Building

@@ -23,6 +23,10 @@ export { ProtectedRoute } from './components/auth/ProtectedRoute';
 export { default as logger } from './utils/logger';
 export type { Logger, LogLevel } from './utils/logger';
 export * from './utils/sanitizer';
+export * from './utils/paths';
+export * from './utils/password-validator';
+export * from './utils/auth-error-mapper';
+export * from './utils/auth-events';
 
 // Export Auth0 service
 export { useAuth0, getAccessToken } from './services/auth0';
