@@ -24,7 +24,17 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', '@auth0/auth0-react'],
+      external: (id) => {
+        // Externalize dependencies
+        if (['react', 'react-dom', 'react/jsx-runtime', '@auth0/auth0-react', 'next', 'next/headers', 'next/server', 'clsx', 'tailwind-merge'].includes(id)) {
+          return true
+        }
+        // Externalize node built-ins
+        if (id.startsWith('node:')) {
+          return true
+        }
+        return false
+      },
       output: {
         globals: {
           react: 'React',

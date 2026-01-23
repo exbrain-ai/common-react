@@ -27,6 +27,7 @@ export * from './utils/paths';
 export * from './utils/password-validator';
 export * from './utils/auth-error-mapper';
 export * from './utils/auth-events';
+export { cn } from './utils/cn';
 
 // Export Auth0 service
 export { useAuth0, getAccessToken } from './services/auth0';

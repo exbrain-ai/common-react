@@ -8,21 +8,27 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs.js"
+    },
+    "./server": {
+      "types": "./src/server/index.ts",
+      "import": "./src/server/index.ts",
+      "require": "./src/server/index.ts",
+      "default": "./src/server/index.ts"
     },
     "./logger": {
+      "types": "./dist/logger.d.ts",
       "import": "./dist/logger.esm.js",
-      "require": "./dist/logger.cjs.js",
-      "types": "./dist/logger.d.ts"
+      "require": "./dist/logger.cjs.js"
     },
     "./styles/index.css": "./dist/styles/index.css",
     "./styles/*": "./dist/styles/*",
     "./utils/auth-events": {
+      "types": "./dist/utils/auth-events.d.ts",
       "import": "./dist/utils/auth-events.esm.js",
-      "require": "./dist/utils/auth-events.cjs.js",
-      "types": "./dist/utils/auth-events.d.ts"
+      "require": "./dist/utils/auth-events.cjs.js"
     }
   },
   "files": [
@@ -42,8 +48,14 @@
   },
   "peerDependencies": {
     "@auth0/auth0-react": "^2.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0",
+    "next": "^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@auth0/auth0-react": "^2.0.0",
@@ -59,6 +71,7 @@
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "jsdom": "^27.4.0",
+    "next": "^16.0.0",
     "pino-pretty": "^13.1.3",
     "typescript": "^4.9.5",
     "vite": "^7.1.6",
@@ -73,6 +86,8 @@
   "author": "Company Team",
   "license": "MIT",
   "dependencies": {
-    "pino": "^10.2.0"
+    "pino": "^10.2.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.5.0"
   }
 }
