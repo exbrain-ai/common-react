@@ -14,6 +14,9 @@ export { Table } from './components/Table';
 export { GreetingForm, type GreetingFormData } from './components/GreetingForm';
 export { StatsTable, type UserStats } from './components/StatsTable';
 
+// Export environment indicator
+export { EnvironmentBanner, detectEnvironment, type Environment } from './components/EnvironmentBanner';
+
 // Export Auth0 components
 export { AuthProvider } from './components/auth/AuthProvider';
 export { AuthButton } from './components/auth/AuthButton';
