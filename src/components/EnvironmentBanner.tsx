@@ -45,7 +45,7 @@ const ENVIRONMENT_CONFIGS: Record<Environment, EnvironmentConfig> = {
   },
   test: {
     label: '🧪 TEST',
-    color: '#f97316', // orange-500
+    color: '#60a5fa', // blue-400, lighter than blue-500 to avoid confusion with local green
     textColor: 'white',
   },
   dev: {
