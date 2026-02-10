@@ -10,7 +10,7 @@
  * @example
  * // In your app's root layout (client-only):
  * const EnvironmentBanner = dynamic(() => import('@company/common-react').then(m => ({ default: m.EnvironmentBanner })), { ssr: false });
- * <EnvironmentBanner version={version} healthUrl="/api/health" />
+ * <EnvironmentBanner version={version} healthUrl="/health" />
  *
  * // Or explicitly specify environment
  * <EnvironmentBanner environment="test" />
