@@ -52,6 +52,34 @@ function MyComponent() {
 }
 ```
 
+### Request ID (correlation across gateway, IAM, backends)
+
+Use request ID so every request and response can be correlated in logs. **Adopt in all apps** (Hello and others).
+
+**Client-side:** use `getRequestIdHeader()` for OpenAPI/default headers and `fetchWithRequestId()` for direct `fetch`:
+
+```tsx
+import { getRequestIdHeader, fetchWithRequestId } from '@exbrain/common-react';
+
+// OpenAPI client: set default headers
+OpenAPI.HEADERS = async () => getRequestIdHeader();
+
+// Direct fetch
+const res = await fetchWithRequestId('/api/greetings', { method: 'POST', body: JSON.stringify(data) });
+```
+
+**Server-side (Next.js API routes):** use `@exbrain/common-react/server` to forward request ID when proxying:
+
+```tsx
+import { getOrCreateRequestId, fetchWithTimeout } from '@exbrain/common-react/server';
+
+const requestId = getOrCreateRequestId(request.headers);
+const response = await fetchWithTimeout(iamUrl, { requestId, method: 'GET' });
+// Echo in response: headers: { 'X-Request-ID': requestId }
+```
+
+See **docs/REQUEST_ID.md** in common-go for the full flow (Go services, gateway, React).
+
 ### Using Utilities
 
 ```tsx

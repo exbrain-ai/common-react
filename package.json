@@ -23,6 +23,12 @@
       "import": "./dist/logger.esm.js",
       "require": "./dist/logger.cjs.js"
     },
+    "./request-id": {
+      "types": "./src/utils/requestId.ts",
+      "import": "./src/utils/requestId.ts",
+      "require": "./src/utils/requestId.ts",
+      "default": "./src/utils/requestId.ts"
+    },
     "./styles/index.css": "./dist/styles/index.css",
     "./styles/*": "./dist/styles/*",
     "./utils/auth-events": {

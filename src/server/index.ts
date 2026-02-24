@@ -8,6 +8,6 @@
  */
 
 export { getOrCreateRequestId } from './requestId'
-export { fetchWithTimeout } from './fetcher'
+export { fetchWithTimeout, REQUEST_ID_HEADER, type FetchWithTimeoutOptions } from './fetcher'
 export { setCookie, getCookie, deleteCookie, getCookies } from './cookies'
 export type { CookieOptions } from './cookies'

@@ -31,6 +31,13 @@ export * from './utils/password-validator';
 export * from './utils/auth-error-mapper';
 export * from './utils/auth-events';
 export { cn } from './utils/cn';
+export {
+  getRequestId,
+  getRequestIdHeader,
+  fetchWithRequestId,
+  REQUEST_ID_COOKIE_NAME,
+  REQUEST_ID_HEADER,
+} from './utils/requestId';
 
 // Export Auth0 service
 export { useAuth0, getAccessToken } from './services/auth0';

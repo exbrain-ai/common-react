@@ -1,18 +1,20 @@
 /**
  * Structured Logger using Pino
- * 
+ *
  * Provides high-performance structured logging for both browser and server contexts.
  * Outputs JSON logs compatible with Loki log aggregation.
- * 
+ *
  * Supports:
  * - Next.js: NEXT_PUBLIC_LOG_LEVEL environment variable
  * - React/Vite: REACT_APP_LOG_LEVEL environment variable (backward compatibility)
  * - Automatic detection of browser vs server context
  * - Configurable log levels: 'debug' | 'info' | 'warn' | 'error'
- * - Client-side log shipping to /api/logs endpoint in production
+ * - Client-side log shipping to same-origin /api/logs (basePath-aware; onebox and cloud)
  */
 
 import pino from 'pino';
+import { apiUrl } from './paths';
+import { getRequestId } from './requestId';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -22,18 +24,30 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 const isBrowser = typeof window !== 'undefined';
 
 /**
- * Get log shipping endpoint from env (optional).
- * When unset or empty, log shipping is disabled (no POST, no 404).
- * Set NEXT_PUBLIC_LOG_SHIPPING_URL or REACT_APP_LOG_SHIPPING_URL to enable (e.g. '/api/logs').
+ * Client-only: fallback request ID when cookie is not set yet (e.g. first log before middleware response).
+ * Reused for all logs in the same page session so we never emit requestId: undefined.
+ */
+let clientSessionRequestId: string | null = null;
+
+function getClientRequestIdForLog(): string {
+  if (!isBrowser) return '';
+  const fromCookie = getRequestId();
+  if (fromCookie) return fromCookie;
+  if (!clientSessionRequestId && typeof crypto !== 'undefined' && crypto.randomUUID) {
+    clientSessionRequestId = crypto.randomUUID();
+  }
+  return clientSessionRequestId || '';
+}
+
+/**
+ * Log shipping endpoint: same-origin POST to /api/logs (basePath-aware).
+ * Canonical path only; no env override. Works in onebox and cloud.
  */
 function getLogShippingEndpoint(): string | null {
-  const url =
-    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_LOG_SHIPPING_URL) ||
-    (typeof process !== 'undefined' && process.env?.REACT_APP_LOG_SHIPPING_URL);
-  if (url && typeof url === 'string' && url.trim() !== '') {
-    return url.trim();
+  if (!isBrowser || typeof window === 'undefined') {
+    return null;
   }
-  return null;
+  return apiUrl('/api/logs');
 }
 
 /**
@@ -95,13 +109,17 @@ class ClientLogShipper {
     const batch = [...this.logQueue];
     this.logQueue = [];
 
-    // Get request ID from cookie for correlation
-    const requestId = this.getRequestIdFromCookie();
+    // Request ID for correlation (cookie or client-session fallback; in body since sendBeacon cannot set headers)
+    let requestId = this.getRequestIdFromCookie() || getClientRequestIdForLog();
+    if (!requestId && typeof crypto !== 'undefined' && crypto.randomUUID) {
+      requestId = crypto.randomUUID();
+    }
 
     try {
       // Send to backend endpoint (fire-and-forget)
-      // Use sendBeacon for reliability (works even if page is unloading)
+      // Include requestId in body so server can correlate (sendBeacon does not support custom headers)
       const payload = JSON.stringify({
+        requestId: requestId || undefined,
         logs: batch,
         userAgent: navigator.userAgent,
         url: window.location.href,
@@ -121,13 +139,18 @@ class ClientLogShipper {
           },
           body: payload,
           keepalive: true, // Keep request alive even if page unloads
-        }).catch(() => {
+        }).catch((err: unknown) => {
           // Silently fail - logging should never break the app
+          if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+            console.warn('[logger] Failed to ship logs to server:', err);
+          }
         });
       }
     } catch (error) {
       // Silently fail - logging should never break the app
-      // Logs are already in console, so we don't lose them
+      if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+        console.warn('[logger] Failed to ship logs:', error);
+      }
     }
   }
 
@@ -238,10 +261,12 @@ function createLogger(): pino.Logger {
           const logLevel = levelLabel as LogLevel;
 
           // Always ship logs to backend for aggregation (works in both dev and prod)
-          // Lazy initialization - only creates shipper when first log needs shipping
+          // Include requestId in every log (cookie or client-session fallback so never undefined in browser)
+          const requestId = getClientRequestIdForLog();
+          const contextWithRequestId = { ...context, requestId: requestId || undefined };
           const shipper = getLogShipper();
           if (shipper) {
-            shipper.addLog(logLevel, msg, context);
+            shipper.addLog(logLevel, msg, contextWithRequestId);
           }
 
           // Console output: Pretty print in development, JSON in production
@@ -250,25 +275,32 @@ function createLogger(): pino.Logger {
             const consoleMethod = levelLabel === 'error' ? 'error' : 
                                  levelLabel === 'warn' ? 'warn' : 
                                  levelLabel === 'debug' ? 'log' : 'info';
-            console[consoleMethod](`[${levelLabel.toUpperCase()}] ${msg}`, context);
+            console[consoleMethod](`[${levelLabel.toUpperCase()}] ${msg}`, contextWithRequestId);
           } else {
-            // Production: Output JSON string to console
-            const logString = typeof o === 'string' ? o : JSON.stringify(o);
-            console.log(logString);
+            // Production: Output JSON string to console (include requestId for correlation)
+            const logObj = typeof o === 'string' ? JSON.parse(o) : o;
+            const withRequestId = { ...logObj, requestId: contextWithRequestId.requestId };
+            console.log(JSON.stringify(withRequestId));
           }
         },
       },
     });
   } else {
     // Server context: Output to stdout (collected by Promtail → Loki)
+    // Use same field names as common-go Zap (message, timestamp, level) for Grafana/LogQL
     return pino({
       level,
+      messageKey: 'message',
       formatters: {
         level: (label) => ({ level: label }),
+        log: (obj) => {
+          // Align with engine: timestamp (ISO8601) and message for Grafana line_format
+          if (obj.time) obj.timestamp = obj.time;
+          return obj;
+        },
       },
       timestamp: pino.stdTimeFunctions.isoTime,
       // Output JSON to stdout (collected by Promtail → Loki)
-      // In development, can use pino-pretty transport for readability
       ...(isDevelopment && {
         transport: {
           target: 'pino-pretty',
