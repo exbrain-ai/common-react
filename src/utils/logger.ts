@@ -273,30 +273,34 @@ function createLogger(): pino.Logger {
             shipper.addLog(logLevel, msg, contextWithRequestId);
           }
 
-          // Console output: Pretty print in development, JSON in production
-          if (isDevelopment) {
-            // Development: Pretty print for easier debugging
-            const consoleMethod = levelLabel === 'error' ? 'error' : 
-                                 levelLabel === 'warn' ? 'warn' : 
-                                 levelLabel === 'debug' ? 'log' : 'info';
-            console[consoleMethod](`[${levelLabel.toUpperCase()}] ${msg}`, contextWithRequestId);
-          } else {
-            // Production: Output JSON string to console (include requestId for correlation)
-            const logObj = typeof o === 'string' ? JSON.parse(o) : o;
-            const withRequestId = { ...logObj, requestId: contextWithRequestId.requestId };
-            console.log(JSON.stringify(withRequestId));
-          }
+          // Console output: one valid JSON line per log (same format as server/engine) so pipeline is consistent.
+          // Do not pass an object as third arg — that makes the console render it with unquoted keys (invalid JSON).
+          const consoleMethod = levelLabel === 'error' ? 'error' : 
+                               levelLabel === 'warn' ? 'warn' : 
+                               levelLabel === 'debug' ? 'log' : 'info';
+          const levelStyles: Record<string, string> = {
+            debug: 'color: #888; font-weight: 500',
+            info: 'color: #1e88e5; font-weight: 600',
+            warn: 'color: #f57c00; font-weight: 600',
+            error: 'color: #c62828; font-weight: 700',
+          };
+          const style = levelStyles[levelLabel] ?? 'font-weight: 500';
+          const badge = `[${levelLabel.toUpperCase()}]`;
+          const logObj = {
+            level: levelLabel,
+            message: msg,
+            timestamp: new Date().toISOString(),
+            ...contextWithRequestId,
+          };
+          const jsonLine = JSON.stringify(logObj);
+          console[consoleMethod](`%c ${badge} %c ${jsonLine}`, style, 'color: inherit; font-weight: normal');
         },
       },
     });
   } else {
-    // Server context: Output to stdout (collected by Promtail → Loki, or piped by ob logs)
-    // Use unified schema field names (LOG_SCHEMA_FIELDS = common-go schema.go) for Grafana/LogQL
-    // When stdout is not a TTY (e.g. Docker, or ob logs | json-log-pretty.sh), output raw JSON
-    const usePretty =
-      isDevelopment &&
-      typeof process !== 'undefined' &&
-      process.stdout?.isTTY === true;
+    // Server context: Always one JSON line per log (same as common-go engine).
+    // Enables: ob logs | json-log-pretty.sh (color) and Promtail → Loki → Grafana (same pipeline as engine).
+    // No pino-pretty; color is only from the post-process script.
     return pino({
       level,
       messageKey: LOG_SCHEMA_FIELDS.message,
@@ -308,16 +312,6 @@ function createLogger(): pino.Logger {
         },
       },
       timestamp: pino.stdTimeFunctions.isoTime,
-      ...(usePretty && {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-          },
-        },
-      }),
     });
   }
 }
