@@ -13,10 +13,14 @@
  */
 
 import pino from 'pino';
+import { LOG_SCHEMA_FIELDS } from './log-schema';
 import { apiUrl } from './paths';
 import { getRequestId } from './requestId';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+/** Re-export unified schema field names (same as common-go/logger/schema.go) for use in app loggers */
+export { LOG_SCHEMA_FIELDS } from './log-schema';
 
 /**
  * Detect if we're running in a browser environment
@@ -286,22 +290,25 @@ function createLogger(): pino.Logger {
       },
     });
   } else {
-    // Server context: Output to stdout (collected by Promtail → Loki)
-    // Use same field names as common-go Zap (message, timestamp, level) for Grafana/LogQL
+    // Server context: Output to stdout (collected by Promtail → Loki, or piped by ob logs)
+    // Use unified schema field names (LOG_SCHEMA_FIELDS = common-go schema.go) for Grafana/LogQL
+    // When stdout is not a TTY (e.g. Docker, or ob logs | json-log-pretty.sh), output raw JSON
+    const usePretty =
+      isDevelopment &&
+      typeof process !== 'undefined' &&
+      process.stdout?.isTTY === true;
     return pino({
       level,
-      messageKey: 'message',
+      messageKey: LOG_SCHEMA_FIELDS.message,
       formatters: {
-        level: (label) => ({ level: label }),
+        level: (label) => ({ [LOG_SCHEMA_FIELDS.level]: label }),
         log: (obj) => {
-          // Align with engine: timestamp (ISO8601) and message for Grafana line_format
-          if (obj.time) obj.timestamp = obj.time;
+          if (obj.time) obj[LOG_SCHEMA_FIELDS.timestamp] = obj.time;
           return obj;
         },
       },
       timestamp: pino.stdTimeFunctions.isoTime,
-      // Output JSON to stdout (collected by Promtail → Loki)
-      ...(isDevelopment && {
+      ...(usePretty && {
         transport: {
           target: 'pino-pretty',
           options: {
@@ -382,5 +389,58 @@ class LoggerWrapper implements Logger {
   }
 }
 
-// Export wrapped logger instance
-export default new LoggerWrapper(logger);
+// Export wrapped logger instance (used by patchConsoleForStructuredLogging)
+const defaultLogger = new LoggerWrapper(logger);
+export default defaultLogger;
+
+export interface PatchConsoleOptions {
+  /** Service name for log correlation (e.g. "hello-ui", "next.js"). Default "app". */
+  service?: string;
+}
+
+/**
+ * Patches global console.log/info/warn/error/debug (Node only) to use the structured pino logger.
+ * Call once at server startup (e.g. from Next.js instrumentation.ts or custom server) so that
+ * Next.js framework logs and any other console usage emit structured JSON (same format as app logs).
+ * No-op in browser.
+ */
+export function patchConsoleForStructuredLogging(options?: PatchConsoleOptions): void {
+  if (typeof window !== 'undefined') return;
+
+  const service = options?.service ?? 'app';
+
+  function serializeArgs(args: unknown[]): { message: string; context?: Record<string, unknown> } {
+    if (args.length === 0) return { message: '' };
+    const first = args[0];
+    const rest = args.slice(1);
+    const message = typeof first === 'string' ? first : JSON.stringify(first);
+    // Unified schema: service + request_id (same fields as common-go schema.go)
+    const context: Record<string, unknown> = {
+      [LOG_SCHEMA_FIELDS.service]: service,
+      [LOG_SCHEMA_FIELDS.request_id]: '',
+    };
+    if (rest.length > 0) context.args = rest.length === 1 ? rest[0] : rest;
+    return { message, context };
+  }
+
+  console.log = (...args: unknown[]) => {
+    const { message, context } = serializeArgs(args);
+    defaultLogger.info(message, context);
+  };
+  console.info = (...args: unknown[]) => {
+    const { message, context } = serializeArgs(args);
+    defaultLogger.info(message, context);
+  };
+  console.warn = (...args: unknown[]) => {
+    const { message, context } = serializeArgs(args);
+    defaultLogger.warn(message, context);
+  };
+  console.error = (...args: unknown[]) => {
+    const { message, context } = serializeArgs(args);
+    defaultLogger.error(message, context);
+  };
+  console.debug = (...args: unknown[]) => {
+    const { message, context } = serializeArgs(args);
+    defaultLogger.debug(message, context);
+  };
+}
