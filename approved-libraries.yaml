@@ -210,6 +210,16 @@ libraries:
     version: "^10.4.0"
     category: Styling
     description: Autoprefixer (peer dependency for Tailwind CSS)
+  
+  - name: clsx
+    version: "^2.1.0"
+    category: Styling
+    description: Utility for constructing className strings (used by common-react cn)
+  
+  - name: tailwind-merge
+    version: "^2.5.0"
+    category: Styling
+    description: Merge Tailwind CSS classes (used by common-react cn)
 
   # Forms & Validation
   - name: react-hook-form
