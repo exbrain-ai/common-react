@@ -65,6 +65,36 @@ libraries:
     version: v3.2.4
     category: Build Tools & Development
     description: Coverage reporting
+  
+  - name: "@next/bundle-analyzer"
+    version: v15.1.0
+    category: Build Tools & Development
+    description: Next.js bundle analysis
+  
+  - name: "@playwright/test"
+    version: v1.57.0
+    category: Build Tools & Development
+    description: Playwright E2E testing
+  
+  - name: "@tanstack/react-query-devtools"
+    version: v5.62.0
+    category: Build Tools & Development
+    description: React Query devtools
+  
+  - name: eslint
+    version: v9.x
+    category: Build Tools & Development
+    description: ESLint
+  
+  - name: eslint-config-next
+    version: v16.0.10
+    category: Build Tools & Development
+    description: Next.js ESLint config
+  
+  - name: jsdom
+    version: v27.4.0
+    category: Build Tools & Development
+    description: DOM implementation for Node (Vitest/JSDOM)
 
   # Testing & Quality
   - name: "@testing-library/react"
