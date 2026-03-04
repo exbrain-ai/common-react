@@ -67,7 +67,7 @@ while IFS= read -r dep; do
     # Internal dependencies (example-org golden app; exbrain company scope)
     if [[ "$dep" =~ ^@(example-org|exbrain)/ ]]; then
         print_success "  ✓ $dep (internal dependency)"
-        ((APPROVED_COUNT++))
+        APPROVED_COUNT=$((APPROVED_COUNT + 1))
         continue
     fi
 
@@ -75,7 +75,7 @@ while IFS= read -r dep; do
     for approved in "${APPROVED_ARRAY[@]}"; do
         if [ "$dep" = "$approved" ]; then
             print_success "  ✓ $dep (approved)"
-            ((APPROVED_COUNT++))
+            APPROVED_COUNT=$((APPROVED_COUNT + 1))
             FOUND=true
             break
         fi
@@ -84,7 +84,7 @@ while IFS= read -r dep; do
     if [ "$FOUND" = false ]; then
         print_error "  ✗ $dep (NOT in approved list)"
         WARNINGS+=("$dep")
-        ((UNAPPROVED_COUNT++))
+        UNAPPROVED_COUNT=$((UNAPPROVED_COUNT + 1))
     fi
 done <<< "$DEPENDENCIES"
 
