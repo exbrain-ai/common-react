@@ -221,6 +221,72 @@ libraries:
     category: Styling
     description: Merge Tailwind CSS classes (used by common-react cn)
 
+  - name: "@tailwindcss/postcss"
+    version: "^4.0.0"
+    category: Styling
+    description: Tailwind CSS v4 PostCSS plugin (required for Next.js webpack/Turbopack integration)
+
+  - name: class-variance-authority
+    version: "^0.7.0"
+    category: Styling
+    description: Utility for building type-safe component variants with Tailwind CSS (used by shadcn/ui)
+
+  - name: lucide-react
+    version: "^0.400.0"
+    category: Styling
+    description: Icon library for React (replaces MUI icons, used with shadcn/ui)
+
+  - name: sonner
+    version: "^1.5.0"
+    category: Styling
+    description: Toast notification library for React (replaces MUI Snackbar)
+
+  # Radix UI Primitives (used by shadcn/ui component library)
+  - name: "@radix-ui/react-accordion"
+    version: "^1.2.0"
+    category: UI Components
+    description: Radix UI Accordion primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-avatar"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Avatar primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-dialog"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Dialog primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-label"
+    version: "^2.1.0"
+    category: UI Components
+    description: Radix UI Label primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-popover"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Popover primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-radio-group"
+    version: "^1.2.0"
+    category: UI Components
+    description: Radix UI RadioGroup primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-separator"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Separator primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-slot"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Slot primitive (shadcn/ui asChild pattern)
+
+  - name: "@radix-ui/react-tooltip"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Tooltip primitive (shadcn/ui)
+
   # Forms & Validation
   - name: react-hook-form
     version: "^7.53.0"
