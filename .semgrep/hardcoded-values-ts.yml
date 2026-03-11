@@ -1,0 +1,65 @@
+# Custom Semgrep rules for common-react: hardcoded URLs and config-like literals (TS/JS only).
+# No dependency on common-go. Convention: use config or constants; exclude constants.ts/js and tests.
+
+rules:
+  - id: hardcoded-url-ts
+    message: "Hardcoded URL detected; use config or env var instead."
+    pattern-regex: |-
+      ["']https?://[^"']*["']
+    languages: [javascript, typescript]
+    severity: WARNING
+    paths:
+      exclude:
+        - '**/*.test.*'
+        - '**/*.spec.*'
+        - '**/__tests__/**'
+        - '**/test/**'
+        - '**/tests/**'
+        - '**/e2e/**'
+        - '**/mocks/**'
+        - '**/fixtures/**'
+        - '**/constants.ts'
+        - '**/constants.js'
+        - '**/docs/**'
+        - '**/scripts/**'
+
+  - id: hardcoded-localhost-ts
+    message: "Hardcoded localhost/127.0.0.1; use config or env var for host/port."
+    pattern-regex: |-
+      ["'](?i)(localhost|127\.0\.0\.1)(:[0-9]+)?["']
+    languages: [javascript, typescript]
+    severity: WARNING
+    paths:
+      exclude:
+        - '**/*.test.*'
+        - '**/*.spec.*'
+        - '**/__tests__/**'
+        - '**/test/**'
+        - '**/tests/**'
+        - '**/e2e/**'
+        - '**/mocks/**'
+        - '**/fixtures/**'
+        - '**/constants.ts'
+        - '**/constants.js'
+        - '**/docs/**'
+        - '**/scripts/**'
+
+  - id: hardcoded-timeout-ts
+    message: "Hardcoded timeout value; use constant or config."
+    pattern-regex: |-
+      timeout\s*:\s*[0-9_]+
+    languages: [javascript, typescript]
+    severity: WARNING
+    paths:
+      exclude:
+        - '**/*.test.*'
+        - '**/*.spec.*'
+        - '**/__tests__/**'
+        - '**/e2e/**'
+        - '**/playwright.config.*'
+        - '**/jest.config.*'
+        - '**/vitest.config.*'
+        - '**/constants.ts'
+        - '**/constants.js'
+        - '**/docs/**'
+        - '**/scripts/**'

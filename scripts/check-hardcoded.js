@@ -4,8 +4,8 @@
  * Same rules as common-go script for TS/TSX; no dependency on common-go.
  * Usage: node check-hardcoded.js <repo_root> <dir1> [dir2 ...]
  */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const root = path.resolve(process.argv[2] || '.');
 const dirs = process.argv.slice(3);
@@ -13,8 +13,11 @@ const dirs = process.argv.slice(3);
 const BAD = /localhost|127\.0\.0\.1|["']3000["']|["']5000["']|["']8080["']|["']5432["']|:3000|:5000|:8080|:5432|http:\/\/|https:\/\//;
 const ALLOW_MARKER = /ALLOW:|golden-allow:/i;
 const ALLOW_WITH_REASON = /(?:ALLOW|golden-allow):\s*\S/i;
-const APPROVED = /getEnvOrConfig\s*\(|getEnvOrDefault\s*\(|process\.env|fmt\.Sprintf\s*\([^)]*(%[sv][^)]*https?:\/\/|https?:\/\/[^)]*%[sv])|strings\.HasPrefix\s*\([^)]+,\s*["']https?:\/\//;
-const APPROVED_TS = /origin\.startsWith\s*\(\s*['"]https?:\/\//|hostname\s*===\s*['"]localhost['"]|hostname\s*===\s*['"]127\.0\.0\.1['"]|\.endsWith\s*\(\s*['"]\.localhost['"]|Auth0.*HTTPS|localhost.*Auth0/;
+const APPROVED = /getEnvOrConfig\s*\(|getEnvOrDefault\s*\(|process\.env|fmt\.Sprintf\s*\([^)]*(%[sv][^)]*https?:\/\/|https?:\/\/[^)]*%[sv])|strings\.HasPrefix\s*\([^)]+,\s*[\x27"]https?:\/\//;
+// RegExp from string so single/double quotes parse correctly under "type": "module"
+const APPROVED_TS = new RegExp(
+  "origin\\.startsWith\\s*\\(\\s*['\"]https?:\\/\\/|hostname\\s*===\\s*['\"]localhost['\"]|hostname\\s*===\\s*['\"]127\\.0\\.0\\.1['\"]|\\.endsWith\\s*\\(\\s*['\"]\\.localhost['\"]|Auth0.*HTTPS|localhost.*Auth0"
+);
 const COMMENT = /^\s*(\/\/|\*|\/\*)/;
 
 function hasValidException(line) {

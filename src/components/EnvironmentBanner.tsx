@@ -22,6 +22,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
+import { DEV_HOST_127, DEV_HOST_LOCALHOST } from '../lib/constants';
 
 const ENV_RIBBON_STORAGE_KEY = 'env-ribbon-left';
 
@@ -98,8 +99,8 @@ function detectEnvironment(): Environment {
 
   // Local development (including onebox: exbrain.onebox)
   if (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
+    hostname === DEV_HOST_LOCALHOST ||
+    hostname === DEV_HOST_127 ||
     hostname.endsWith('.local') ||
     hostname.endsWith('.localhost') ||
     hostname.endsWith('.onebox')
