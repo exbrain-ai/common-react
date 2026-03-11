@@ -1,6 +1,4 @@
-# CI: golden check, lint, test, build. No dependency on common-go.
-# Wave 1: golden-check (self-contained in this repo).
-# Wave 2 (parallel): lint, test, build.
+# CI: golden check, lint, test, build, Semgrep (self-contained; no dependency on common-go).
 
 name: CI
 
@@ -14,6 +12,7 @@ on:
       - 'tsconfig*.json'
       - 'vite.config.*'
       - 'scripts/**'
+      - '.semgrep/**'
       - '.github/**'
   pull_request:
     branches: [ main, develop ]
@@ -24,9 +23,30 @@ on:
       - 'tsconfig*.json'
       - 'vite.config.*'
       - 'scripts/**'
+      - '.semgrep/**'
       - '.github/**'
 
 jobs:
+  semgrep:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/src" \
+            -w /src \
+            semgrep/semgrep:latest \
+            semgrep scan \
+              --config p/ci \
+              --config .semgrep \
+              --error \
+              --metrics=off \
+              .
+
   golden-check:
     name: Golden check
     runs-on: ubuntu-latest
@@ -98,3 +118,32 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  all-checks:
+    name: All Checks Summary
+    runs-on: ubuntu-latest
+    needs:
+      - semgrep
+      - golden-check
+      - lint
+      - test
+      - build
+    if: always()
+    steps:
+      - name: Evaluate results
+        run: |
+          FAILED=()
+          check() { if [ "$1" != "success" ]; then FAILED+=("$2"); fi; }
+
+          check "${{ needs.semgrep.result }}"       "Semgrep SAST"
+          check "${{ needs.golden-check.result }}"  "Golden check"
+          check "${{ needs.lint.result }}"          "Lint"
+          check "${{ needs.test.result }}"          "Test"
+          check "${{ needs.build.result }}"         "Build"
+
+          if [ ${#FAILED[@]} -gt 0 ]; then
+            echo "❌ Failed checks: ${FAILED[*]}"
+            exit 1
+          fi
+
+          echo "✅ All required checks passed"

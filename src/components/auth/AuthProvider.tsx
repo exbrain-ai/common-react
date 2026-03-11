@@ -6,6 +6,8 @@
 
 import React from 'react';
 import { Auth0Provider as Auth0ProviderBase } from '@auth0/auth0-react';
+import { ORIGIN_PREFIX_127, ORIGIN_PREFIX_LOCALHOST, URL_SCHEME_HTTPS } from '../../lib/constants';
+import { MSG_AUTH0_DISABLED_HTTP_WARN } from '../../lib/messages';
 import type { Auth0Config } from '../../types/auth0';
 
 interface AuthProviderProps {
@@ -23,11 +25,11 @@ function isSecureOrigin(): boolean {
   }
   const origin = window.location.origin;
   // HTTPS is always secure
-  if (origin.startsWith('https://')) {
+  if (origin.startsWith(URL_SCHEME_HTTPS)) {
     return true;
   }
   // localhost is allowed for development
-  if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+  if (origin.startsWith(ORIGIN_PREFIX_LOCALHOST) || origin.startsWith(ORIGIN_PREFIX_127)) {
     return true;
   }
   // HTTP on other domains is not secure
@@ -46,7 +48,7 @@ function isSecureOrigin(): boolean {
  * <AuthProvider config={{
  *   domain: 'your-tenant.auth0.com',
  *   clientId: 'your-client-id',
- *   audience: 'https://your-api.com'
+ *   audience: '<your-api-audience>'
  * }}>
  *   <App />
  * </AuthProvider>
@@ -90,10 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
   // For HTTP (non-localhost), skip Auth0 initialization
   // Auth0 requires HTTPS or localhost for Web Crypto API
   if (!secure) {
-    console.warn(
-      '⚠️  Auth0 disabled: App is running on HTTP (non-localhost). ' +
-      'Auth0 requires HTTPS or localhost. The app will work without authentication.'
-    );
+    console.warn(MSG_AUTH0_DISABLED_HTTP_WARN);
     return <>{children}</>;
   }
   

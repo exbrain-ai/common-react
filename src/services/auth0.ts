@@ -5,6 +5,12 @@
  */
 
 import { useAuth0 as useAuth0Base } from '@auth0/auth0-react';
+import { ORIGIN_PREFIX_127, ORIGIN_PREFIX_LOCALHOST, URL_SCHEME_HTTPS } from '../lib/constants';
+import {
+  MSG_AUTH0_NOT_AVAILABLE_HTTP,
+  MSG_AUTH0_PROVIDER_NOT_AVAILABLE,
+  MSG_MISSING_REFRESH_TOKEN,
+} from '../lib/messages';
 import type { Auth0User } from '../types/auth0';
 
 /**
@@ -16,9 +22,9 @@ function isSecureOrigin(): boolean {
   }
   const origin = window.location.origin;
   return (
-    origin.startsWith('https://') ||
-    origin.startsWith('http://localhost') ||
-    origin.startsWith('http://127.0.0.1')
+    origin.startsWith(URL_SCHEME_HTTPS) ||
+    origin.startsWith(ORIGIN_PREFIX_LOCALHOST) ||
+    origin.startsWith(ORIGIN_PREFIX_127)
   );
 }
 
@@ -35,23 +41,23 @@ export function useAuth0() {
       user: undefined,
       error: undefined,
       getAccessTokenSilently: async () => {
-        throw new Error('Auth0 is not available on HTTP (non-localhost). Use HTTPS or localhost.');
+        throw new Error(MSG_AUTH0_NOT_AVAILABLE_HTTP);
       },
       getAccessTokenWithPopup: async () => {
-        throw new Error('Auth0 is not available on HTTP (non-localhost). Use HTTPS or localhost.');
+        throw new Error(MSG_AUTH0_NOT_AVAILABLE_HTTP);
       },
       getIdTokenClaims: async () => undefined,
       loginWithRedirect: () => {
         console.warn('Auth0 login is not available on HTTP (non-localhost). Use HTTPS or localhost.');
       },
       loginWithPopup: async () => {
-        throw new Error('Auth0 is not available on HTTP (non-localhost). Use HTTPS or localhost.');
+        throw new Error(MSG_AUTH0_NOT_AVAILABLE_HTTP);
       },
       logout: () => {
         console.warn('Auth0 logout is not available on HTTP (non-localhost). Use HTTPS or localhost.');
       },
       handleRedirectCallback: async () => {
-        throw new Error('Auth0 is not available on HTTP (non-localhost). Use HTTPS or localhost.');
+        throw new Error(MSG_AUTH0_NOT_AVAILABLE_HTTP);
       },
     };
   }
@@ -72,23 +78,23 @@ export function useAuth0() {
       user: undefined,
       error: undefined,
       getAccessTokenSilently: async () => {
-        throw new Error('Auth0Provider is not available');
+        throw new Error(MSG_AUTH0_PROVIDER_NOT_AVAILABLE);
       },
       getAccessTokenWithPopup: async () => {
-        throw new Error('Auth0Provider is not available');
+        throw new Error(MSG_AUTH0_PROVIDER_NOT_AVAILABLE);
       },
       getIdTokenClaims: async () => undefined,
       loginWithRedirect: () => {
         console.warn('Auth0Provider is not available');
       },
       loginWithPopup: async () => {
-        throw new Error('Auth0Provider is not available');
+        throw new Error(MSG_AUTH0_PROVIDER_NOT_AVAILABLE);
       },
       logout: () => {
         console.warn('Auth0Provider is not available');
       },
       handleRedirectCallback: async () => {
-        throw new Error('Auth0Provider is not available');
+        throw new Error(MSG_AUTH0_PROVIDER_NOT_AVAILABLE);
       },
     };
   }
@@ -113,9 +119,7 @@ export async function getAccessToken(
         'This usually happens if you logged in before the offline_access scope was enabled.'
       );
       // Suggest clearing storage and re-authenticating
-      throw new Error(
-        'Missing Refresh Token. Please clear your browser storage (localStorage) and log in again to obtain a refresh token.'
-      );
+      throw new Error(MSG_MISSING_REFRESH_TOKEN);
     }
     console.error('Failed to get access token:', error);
     return null;

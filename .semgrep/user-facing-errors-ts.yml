@@ -1,0 +1,22 @@
+# User-facing error messages: use constants from src/lib/messages.ts (common-react self-contained).
+
+rules:
+  - id: user-facing-error-literal-throw-ts
+    message: "User-facing error in throw new Error('...') should be a constant (e.g. from lib/messages), not an inline string."
+    pattern-regex: 'throw new Error\s*\(\s*"[^"]*"\)'
+    languages: [javascript, typescript]
+    severity: WARNING
+    paths:
+      exclude:
+        - '**/*.test.*'
+        - '**/*.spec.*'
+        - '**/__tests__/**'
+        - '**/test/**'
+        - '**/tests/**'
+        - '**/mocks/**'
+        - '**/fixtures/**'
+        - '**/lib/messages.ts'
+        - '**/app/lib/messages.ts'
+        - '**/constants.ts'
+        - '**/next.config.*'
+        - '**/services/auth0.ts'
