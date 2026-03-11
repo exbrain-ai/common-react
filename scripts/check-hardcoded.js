@@ -34,7 +34,7 @@ function walk(dir, base, out) {
       walk(full, base, out);
       continue;
     }
-    if (!/\.(ts|tsx)$/.test(name) || /\.test\.(ts|tsx)$|constants\.ts$|setupTests\.ts$/.test(rel)) continue;
+    if (!/\.(ts|tsx)$/.test(name) || /\.test\.(ts|tsx)$|constants\.ts$|messages\.ts$|setupTests\.ts$/.test(rel)) continue;
     const lines = fs.readFileSync(full, 'utf8').split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];

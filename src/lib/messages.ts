@@ -6,6 +6,9 @@
 // Auth0 / secure-origin fallbacks (when Auth0 is not available)
 export const MSG_AUTH0_NOT_AVAILABLE_HTTP =
   'Auth0 is not available on HTTP (non-localhost). Use HTTPS or localhost.'
+/** Console warning when Auth0 is disabled on HTTP (non-localhost). */
+export const MSG_AUTH0_DISABLED_HTTP_WARN =
+  '⚠️  Auth0 disabled: App is running on HTTP (non-localhost). Auth0 requires HTTPS or localhost. The app will work without authentication.'
 export const MSG_AUTH0_PROVIDER_NOT_AVAILABLE = 'Auth0Provider is not available'
 export const MSG_MISSING_REFRESH_TOKEN =
   'Missing Refresh Token. Please clear your browser storage (localStorage) and log in again to obtain a refresh token.'

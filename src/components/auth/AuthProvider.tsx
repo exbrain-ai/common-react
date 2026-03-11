@@ -7,6 +7,7 @@
 import React from 'react';
 import { Auth0Provider as Auth0ProviderBase } from '@auth0/auth0-react';
 import { ORIGIN_PREFIX_127, ORIGIN_PREFIX_LOCALHOST, URL_SCHEME_HTTPS } from '../../lib/constants';
+import { MSG_AUTH0_DISABLED_HTTP_WARN } from '../../lib/messages';
 import type { Auth0Config } from '../../types/auth0';
 
 interface AuthProviderProps {
@@ -91,10 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
   // For HTTP (non-localhost), skip Auth0 initialization
   // Auth0 requires HTTPS or localhost for Web Crypto API
   if (!secure) {
-    console.warn(
-      '⚠️  Auth0 disabled: App is running on HTTP (non-localhost). ' +
-      'Auth0 requires HTTPS or localhost. The app will work without authentication.'
-    );
+    console.warn(MSG_AUTH0_DISABLED_HTTP_WARN);
     return <>{children}</>;
   }
   
