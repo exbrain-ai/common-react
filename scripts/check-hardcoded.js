@@ -3,6 +3,13 @@
  * No hardcoded literals in product code (localhost, ports, URLs) — common-react only.
  * Same rules as common-go script for TS/TSX; no dependency on common-go.
  * Usage: node check-hardcoded.js <repo_root> <dir1> [dir2 ...]
+ *
+ * Exclusions (justified):
+ * - generated|node_modules: not our source; third-party or generated code.
+ * - *.test.(ts|tsx): tests assert on specific values; literals in tests are expected.
+ * - constants.ts: canonical store for config-like constants (URLs, hosts, ports). Rule is "no literals in product code"; constants live here by design.
+ * - messages.ts: canonical store for user-facing and operational copy. Rule is "no literals in components/services"; messages live here by design.
+ * - setupTests.ts: test setup/fixtures; can contain test-only literals.
  */
 import fs from 'fs';
 import path from 'path';
@@ -20,6 +27,9 @@ const APPROVED_TS = new RegExp(
 );
 const COMMENT = /^\s*(\/\/|\*|\/\*)/;
 
+// File exclusions: only canonical stores and test artifacts (see header).
+const EXCLUDED_FILES = /\.test\.(ts|tsx)$|constants\.ts$|messages\.ts$|setupTests\.ts$/;
+
 function hasValidException(line) {
   return ALLOW_MARKER.test(line) && ALLOW_WITH_REASON.test(line);
 }
@@ -34,7 +44,7 @@ function walk(dir, base, out) {
       walk(full, base, out);
       continue;
     }
-    if (!/\.(ts|tsx)$/.test(name) || /\.test\.(ts|tsx)$|constants\.ts$|messages\.ts$|setupTests\.ts$/.test(rel)) continue;
+    if (!/\.(ts|tsx)$/.test(name) || EXCLUDED_FILES.test(rel)) continue;
     const lines = fs.readFileSync(full, 'utf8').split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
