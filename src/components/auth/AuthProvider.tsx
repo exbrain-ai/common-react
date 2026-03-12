@@ -9,6 +9,7 @@ import { Auth0Provider as Auth0ProviderBase } from '@auth0/auth0-react';
 import { ORIGIN_PREFIX_127, ORIGIN_PREFIX_LOCALHOST, URL_SCHEME_HTTPS } from '../../lib/constants';
 import { MSG_AUTH0_DISABLED_HTTP_WARN } from '../../lib/messages';
 import type { Auth0Config } from '../../types/auth0';
+import logger from '../../utils/logger';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -92,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
   // For HTTP (non-localhost), skip Auth0 initialization
   // Auth0 requires HTTPS or localhost for Web Crypto API
   if (!secure) {
-    console.warn(MSG_AUTH0_DISABLED_HTTP_WARN);
+    logger.warn(MSG_AUTH0_DISABLED_HTTP_WARN);
     return <>{children}</>;
   }
   
