@@ -24,15 +24,15 @@ export interface ButtonProps extends BaseComponentProps {
   type?: 'button' | 'submit' | 'reset';
 }
 
-export interface TableColumn<T = any> {
+export interface TableColumn<T = unknown> {
   key: keyof T | string;
   label: string;
   sortable?: boolean;
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: unknown, row: T) => React.ReactNode;
   className?: string;
 }
 
-export interface TableProps<T = any> extends BaseComponentProps {
+export interface TableProps<T = unknown> extends BaseComponentProps {
   data: T[];
   columns: TableColumn<T>[];
   emptyMessage?: string;
@@ -51,10 +51,10 @@ export interface StatusBannerProps extends BaseComponentProps {
 }
 
 export interface FormProps extends BaseComponentProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: unknown) => void;
   loading?: boolean;
   disabled?: boolean;
-  validation?: Record<string, (value: any) => string | undefined>;
+  validation?: Record<string, (value: unknown) => string | undefined>;
 }
 
 export interface LoadingState {

@@ -69,7 +69,7 @@ export function useAuth0() {
       ...auth0,
       user: auth0.user as Auth0User | undefined,
     };
-  } catch (error) {
+  } catch {
     // If Auth0Provider is not present, return mock context
     console.warn('Auth0Provider not found, returning mock context');
     return {

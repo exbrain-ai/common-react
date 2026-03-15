@@ -70,9 +70,7 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
     }
   };
 
-  // Form is valid if name is provided OR if name is optional (e.g., from Auth0)
-  // For now, we'll allow submission even without name (backend will use Auth0 name)
-  const isFormValid = true; // Always allow submission - name can come from Auth0
+  // Form is valid: always allow submission - name can come from Auth0 if authenticated
   const isDisabled = disabled || loading;
 
   return (

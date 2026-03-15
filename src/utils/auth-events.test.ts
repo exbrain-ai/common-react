@@ -215,12 +215,12 @@ describe('auth events', () => {
       const ua = getBrowserUserAgent();
       expect(ua).toBe('Mozilla/5.0 (Test)');
       // Cleanup
-      delete (global as any).window;
+      delete (global as Record<string, unknown>).window;
     });
 
     it('should return empty string when window is not available', () => {
       // Ensure window is not defined
-      delete (global as any).window;
+      delete (global as Record<string, unknown>).window;
       const ua = getBrowserUserAgent();
       expect(ua).toBe('');
     });
@@ -235,7 +235,7 @@ describe('auth events', () => {
       const ua = getBrowserUserAgent();
       expect(ua).toBe('');
       // Cleanup
-      delete (global as any).window;
+      delete (global as Record<string, unknown>).window;
     });
   });
 });
