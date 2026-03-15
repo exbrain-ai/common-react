@@ -17,7 +17,7 @@ export const FormField: React.FC<FormFieldComponentProps> = ({
   required = false,
   error,
   help,
-  disabled = false,
+  disabled: _disabledProp = false,
   id,
   children,
   errorId,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapAuthError, extractAuthError, type AuthError } from './auth-error-mapper';
+import { mapAuthError, extractAuthError } from './auth-error-mapper';
 
 describe('auth error mapper', () => {
   describe('mapAuthError', () => {

@@ -3,7 +3,6 @@ import {
   validatePassword,
   validatePasswordSingleError,
   type PasswordPolicyConfig,
-  type PasswordValidationResult,
 } from './password-validator';
 
 describe('password validator', () => {

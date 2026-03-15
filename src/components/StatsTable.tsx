@@ -56,18 +56,18 @@ export const StatsTable: React.FC<StatsTableProps> = ({ data, className = '' }) 
     {
       key: 'count',
       label: 'Count',
-      render: (value) => (
+      render: (value: unknown) => (
         <div className="exbrain-text-center" style={{ fontWeight: '600', color: 'var(--exbrain-primary)' }}>
-          {value}
+          {value as React.ReactNode}
         </div>
       ),
     },
     {
       key: 'lastHelloAt',
       label: 'Last Hello At',
-      render: (value) => (
+      render: (value: unknown) => (
         <div className="exbrain-text-muted" style={{ fontSize: 'var(--exbrain-font-size-sm)' }}>
-          {formatTimestamp(value)}
+          {formatTimestamp(value as string)}
         </div>
       ),
     },

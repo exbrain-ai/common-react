@@ -16,7 +16,7 @@ describe('path utilities', () => {
     // Reset environment variable
     delete process.env.NEXT_PUBLIC_BASE_PATH;
     // Reset window object
-    delete (global as any).window;
+    delete (global as Record<string, unknown>).window;
   });
 
   afterEach(() => {
@@ -30,7 +30,7 @@ describe('path utilities', () => {
     if (originalWindow !== undefined) {
       global.window = originalWindow;
     } else {
-      delete (global as any).window;
+      delete (global as Record<string, unknown>).window;
     }
   });
 
@@ -45,7 +45,7 @@ describe('path utilities', () => {
     });
 
     it('should return basePath from environment variable (client-side)', () => {
-      global.window = {} as any;
+      global.window = {} as Window;
       process.env.NEXT_PUBLIC_BASE_PATH = '/hello';
       expect(getBasePath()).toBe('/hello');
     });

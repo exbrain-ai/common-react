@@ -249,7 +249,6 @@ function getLogLevel(): LogLevel {
  */
 function createLogger(): pino.Logger {
   const level = getLogLevel();
-  const isDevelopment = process.env.NODE_ENV === 'development';
 
   if (isBrowser) {
     // Browser context: Use browser console with structured JSON output

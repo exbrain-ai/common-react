@@ -6,7 +6,6 @@
 
 import React from 'react';
 import { useAuth0 } from '../../services/auth0';
-import type { Auth0User } from '../../types/auth0';
 import './AuthButton.css';
 
 /**

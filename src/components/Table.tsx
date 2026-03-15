@@ -7,7 +7,7 @@ import { TableProps, TableColumn } from '../types/common';
 
 export type { TableColumn };
 
-export const Table = <T extends Record<string, any>>({
+export const Table = <T extends object>({
   data,
   columns,
   emptyMessage = 'No data available',
@@ -32,21 +32,21 @@ export const Table = <T extends Record<string, any>>({
     if (!sortKey || !sortable) return data;
 
     return [...data].sort((a, b) => {
-      const aValue = a[sortKey];
-      const bValue = b[sortKey];
+      const aValue = (a as Record<string, unknown>)[sortKey];
+      const bValue = (b as Record<string, unknown>)[sortKey];
 
       if (aValue === bValue) return 0;
 
-      const comparison = aValue < bValue ? -1 : 1;
+      const comparison = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
       return sortDirection === 'asc' ? comparison : -comparison;
     });
   }, [data, sortKey, sortDirection, sortable]);
 
-  const renderCell = (column: TableColumn<T>, row: T) => {
+  const renderCell = (column: TableColumn<T>, row: T): React.ReactNode => {
     if (column.render) {
       return column.render(row[column.key as keyof T], row);
     }
-    return row[column.key as keyof T];
+    return row[column.key as keyof T] as React.ReactNode;
   };
 
   if (loading) {
