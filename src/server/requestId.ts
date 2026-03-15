@@ -12,9 +12,9 @@ export function getOrCreateRequestId(
   
   if (headers instanceof Headers) {
     existingId = headers.get('X-Request-ID')
-  } else if (headers && typeof headers === 'object' && 'get' in headers && typeof (headers as { get: (name: string) => string | null }).get === 'function') {
-    // NextRequest headers
-    existingId = (headers as { get: (name: string) => string | null }).get('X-Request-ID')
+  } else if (headers && typeof headers === 'object' && 'get' in headers && typeof (headers as unknown as { get: (name: string) => string | null }).get === 'function') {
+    // NextRequest headers (object with get method; cast via unknown for strict overlap)
+    existingId = (headers as unknown as { get: (name: string) => string | null }).get('X-Request-ID')
   } else {
     // HeadersInit (plain object or array)
     const headersObj = new Headers(headers as HeadersInit)
