@@ -1,0 +1,45 @@
+# Reusable workflow: run dependency-cruiser in a UI package.
+# Each app keeps its own .dependency-cruiser.cjs (app-specific rules). This workflow only runs the tool.
+#
+# Call from hello, admin-ui, exbrain-ui, or any repo with a UI that uses dependency-cruiser:
+#   jobs:
+#     lint-deps:
+#       uses: exbrain-ai/common-react/.github/workflows/dependency-cruiser.yml@main
+#       with:
+#         checkout-path: 'hello'      # optional; if set, checkout caller repo to this path
+#         working-directory: 'hello/ui'  # path (relative to repo root) where to run npx dependency-cruiser
+
+name: Dependency Cruiser (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      checkout-path:
+        description: 'If set, checkout caller repo to this path (e.g. hello). Leave empty for repo root.'
+        required: false
+        default: ''
+        type: string
+      working-directory:
+        description: 'Path from repo root to run dependency-cruiser (e.g. hello/ui when checkout-path is hello).'
+        required: false
+        default: '.'
+        type: string
+
+jobs:
+  lint-deps:
+    name: Dependency Cruiser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ inputs.checkout-path || '.' }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run dependency-cruiser
+        working-directory: ${{ inputs.working-directory }}
+        run: npx dependency-cruiser@latest .

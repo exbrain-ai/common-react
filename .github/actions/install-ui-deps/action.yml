@@ -1,0 +1,38 @@
+# Composite action: npm ci + Rollup Linux optional dep fix.
+# Use in CI when npm ci can omit optional deps on Linux (https://github.com/npm/cli/issues/4828).
+#
+# Usage (from hello or any app with UI in a subdir):
+#   - uses: actions/checkout@v4
+#     with:
+#       path: hello
+#   - uses: actions/setup-node@v4
+#     with:
+#       node-version: '20'
+#       cache: 'npm'
+#       cache-dependency-path: hello/ui/package-lock.json
+#   - uses: exbrain-ai/common-react/.github/actions/install-ui-deps@main
+#     with:
+#       path: hello/ui
+#   - run: npm run test:coverage
+#     working-directory: hello/ui
+
+name: Install UI deps (with Rollup optional fix)
+description: Run npm ci and install @rollup/rollup-linux-x64-gnu for Linux CI
+
+inputs:
+  path:
+    description: 'Path to UI package (e.g. hello/ui or . for repo root)'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+      working-directory: ${{ inputs.path }}
+
+    - name: Install Rollup Linux native binary (optional deps workaround)
+      shell: bash
+      run: npm install @rollup/rollup-linux-x64-gnu --no-save
+      working-directory: ${{ inputs.path }}
