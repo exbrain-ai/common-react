@@ -5,7 +5,7 @@
 import React from 'react';
 import { StatusBannerProps } from '../types/common';
 
-export const StatusBanner: React.FC<StatusBannerProps> = ({
+export function StatusBanner({
   type = 'info',
   message,
   onRetry,
@@ -13,7 +13,7 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({
   dismissible = false,
   onDismiss,
   className = '',
-}) => {
+}: StatusBannerProps): React.ReactElement {
   const getIcon = () => {
     switch (type) {
       case 'info':
@@ -60,6 +60,5 @@ export const StatusBanner: React.FC<StatusBannerProps> = ({
       </div>
     </div>
   );
-};
-
+}
 
