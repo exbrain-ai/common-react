@@ -29,6 +29,7 @@ jobs:
   lint-deps:
     name: Dependency Cruiser
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
       - name: Checkout
         uses: actions/checkout@v4
