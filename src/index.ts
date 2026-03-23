@@ -33,6 +33,7 @@ export * from './utils/auth-events';
 export { cn } from './utils/cn';
 export {
   getRequestId,
+  getOrCreateClientRequestId,
   getRequestIdHeader,
   fetchWithRequestId,
   REQUEST_ID_COOKIE_NAME,

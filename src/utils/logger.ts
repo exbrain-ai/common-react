@@ -15,7 +15,7 @@
 import pino from 'pino';
 import { LOG_SCHEMA_FIELDS } from './log-schema';
 import { apiUrl } from './paths';
-import { getRequestId } from './requestId';
+import { getOrCreateClientRequestId } from './requestId';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -26,22 +26,6 @@ export { LOG_SCHEMA_FIELDS } from './log-schema';
  * Detect if we're running in a browser environment
  */
 const isBrowser = typeof window !== 'undefined';
-
-/**
- * Client-only: fallback request ID when cookie is not set yet (e.g. first log before middleware response).
- * Reused for all logs in the same page session so we never emit requestId: undefined.
- */
-let clientSessionRequestId: string | null = null;
-
-function getClientRequestIdForLog(): string {
-  if (!isBrowser) return '';
-  const fromCookie = getRequestId();
-  if (fromCookie) return fromCookie;
-  if (!clientSessionRequestId && typeof crypto !== 'undefined' && crypto.randomUUID) {
-    clientSessionRequestId = crypto.randomUUID();
-  }
-  return clientSessionRequestId || '';
-}
 
 /**
  * Log shipping endpoint: same-origin POST to /api/logs (basePath-aware).
@@ -113,8 +97,8 @@ class ClientLogShipper {
     const batch = [...this.logQueue];
     this.logQueue = [];
 
-    // Request ID for correlation (cookie or client-session fallback; in body since sendBeacon cannot set headers)
-    let requestId = this.getRequestIdFromCookie() || getClientRequestIdForLog();
+    // Request ID for correlation (same source as X-Request-ID on API calls; body only — sendBeacon has no headers)
+    let requestId = getOrCreateClientRequestId();
     if (!requestId && typeof crypto !== 'undefined' && crypto.randomUUID) {
       requestId = crypto.randomUUID();
     }
@@ -156,24 +140,6 @@ class ClientLogShipper {
         console.warn('[logger] Failed to ship logs:', error);
       }
     }
-  }
-
-  /**
-   * Get request ID from cookie for correlation
-   */
-  private getRequestIdFromCookie(): string | null {
-    if (typeof document === 'undefined') {
-      return null;
-    }
-
-    const cookies = document.cookie.split(';');
-    for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'x-request-id') {
-        return decodeURIComponent(value);
-      }
-    }
-    return null;
   }
 
   /**
@@ -265,7 +231,7 @@ function createLogger(): pino.Logger {
 
           // Always ship logs to backend for aggregation (works in both dev and prod)
           // Include requestId in every log (cookie or client-session fallback so never undefined in browser)
-          const requestId = getClientRequestIdForLog();
+          const requestId = getOrCreateClientRequestId();
           const contextWithRequestId = { ...context, requestId: requestId || undefined };
           const shipper = getLogShipper();
           if (shipper) {
