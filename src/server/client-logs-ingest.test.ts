@@ -46,6 +46,44 @@ describe("createClientLogsPostHandler", () => {
     expect(data.success).toBe(true);
   });
 
+  it("returns 200 using x-request-id header when body has no requestId and X-Request-ID absent", async () => {
+    const req = new Request("http://localhost/api/logs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-request-id": "  low-id  ",
+      },
+      body: JSON.stringify({
+        logs: [{ level: "info", message: "ping" }],
+        url: "",
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(writeSpy).toHaveBeenCalled();
+    const written = String(writeSpy?.mock.calls[0]?.[0] ?? "");
+    expect(written).toContain('"request_id":"low-id"');
+  });
+
+  it("normalizes log entry message and merges object context", async () => {
+    const req = new Request("http://localhost/api/logs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        requestId: "r1",
+        logs: [
+          { level: "warn", message: 123, context: { extra: "x" } },
+          { level: "info", message: "ok", context: null },
+        ],
+        url: "/page",
+      }),
+    });
+    await POST(req);
+    const lines = (writeSpy?.mock.calls ?? []).map((c) => String(c[0]));
+    expect(lines.some((l) => l.includes('"message":"—"') && l.includes('"extra":"x"'))).toBe(true);
+    expect(lines.some((l) => l.includes('"message":"ok"'))).toBe(true);
+  });
+
   it("returns 400 when body is invalid JSON", async () => {
     const req = new Request("http://localhost/api/logs", {
       method: "POST",
