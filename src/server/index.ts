@@ -11,3 +11,13 @@ export { getOrCreateRequestId } from './requestId'
 export { fetchWithTimeout, REQUEST_ID_HEADER, type FetchWithTimeoutOptions } from './fetcher'
 export { setCookie, getCookie, deleteCookie, getCookies } from './cookies'
 export type { CookieOptions } from './cookies'
+
+export {
+  applyRequestIdToNextResponse,
+  resolveRequestIdFromRequest,
+  DEFAULT_REQUEST_ID_COOKIE_NAME,
+  type ApplyRequestIdToNextResponseOptions,
+  type RequestIdSource,
+  type ResponseWithRequestIdCookie,
+} from './middleware-request-id'
+export { createClientLogsPostHandler, type ClientLogsIngestOptions } from './client-logs-ingest'

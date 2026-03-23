@@ -98,9 +98,9 @@ libraries:
 
   # Testing & Quality
   - name: "@testing-library/react"
-    version: v13.4.0
+    version: v16.3.2
     category: Testing & Quality
-    description: React testing utilities
+    description: React testing utilities (React 18/19 peer range)
   
   - name: "@testing-library/dom"
     version: v10.4.1
