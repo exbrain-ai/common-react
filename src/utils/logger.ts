@@ -15,7 +15,7 @@
 import pino from 'pino';
 import { LOG_SCHEMA_FIELDS } from './log-schema';
 import { apiUrl } from './paths';
-import { getOrCreateClientRequestId } from './requestId';
+import { createBatchRequestId, getOrCreateClientBrowserId, getBrowserIdHeader, registerFetchLogger } from './requestId';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -97,17 +97,18 @@ class ClientLogShipper {
     const batch = [...this.logQueue];
     this.logQueue = [];
 
-    // Request ID for correlation (same source as X-Request-ID on API calls; body only — sendBeacon has no headers)
-    let requestId = getOrCreateClientRequestId();
-    if (!requestId && typeof crypto !== 'undefined' && crypto.randomUUID) {
-      requestId = crypto.randomUUID();
-    }
+    // Browser ID for correlation (stable session correlator; body only — sendBeacon has no headers)
+    const browserId = getOrCreateClientBrowserId();
+    // Batch request ID: `00000000-xxxx-...` prefix marks it as a batch transport ID in Grafana/Loki.
+    // Included in body (works for both sendBeacon and fetch) and in X-Request-ID header (fetch only).
+    const batchRequestId = createBatchRequestId();
 
     try {
       // Send to backend endpoint (fire-and-forget)
-      // Include requestId in body so server can correlate (sendBeacon does not support custom headers)
+      // Include browserId and batchRequestId in body (sendBeacon does not support custom headers)
       const payload = JSON.stringify({
-        requestId: requestId || undefined,
+        browserId: browserId || undefined,
+        batchRequestId: batchRequestId || undefined,
         logs: batch,
         userAgent: navigator.userAgent,
         url: window.location.href,
@@ -123,7 +124,8 @@ class ClientLogShipper {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(requestId && { 'X-Request-ID': requestId }),
+            ...getBrowserIdHeader(),
+            ...(batchRequestId ? { 'X-Request-ID': batchRequestId } : {}),
           },
           body: payload,
           keepalive: true, // Keep request alive even if page unloads
@@ -230,12 +232,12 @@ function createLogger(): pino.Logger {
           const logLevel = levelLabel as LogLevel;
 
           // Always ship logs to backend for aggregation (works in both dev and prod)
-          // Include requestId in every log (cookie or client-session fallback so never undefined in browser)
-          const requestId = getOrCreateClientRequestId();
-          const contextWithRequestId = { ...context, requestId: requestId || undefined };
+          // Include browserId in every log (cookie or client-session fallback so never undefined in browser)
+          const browserId = getOrCreateClientBrowserId();
+          const contextWithBrowserId = { ...context, browserId: browserId || undefined };
           const shipper = getLogShipper();
           if (shipper) {
-            shipper.addLog(logLevel, msg, contextWithRequestId);
+            shipper.addLog(logLevel, msg, contextWithBrowserId);
           }
 
           // Console output: one valid JSON line per log (same format as server/engine) so pipeline is consistent.
@@ -255,7 +257,7 @@ function createLogger(): pino.Logger {
             level: levelLabel,
             message: msg,
             timestamp: new Date().toISOString(),
-            ...contextWithRequestId,
+            ...contextWithBrowserId,
           };
           const jsonLine = JSON.stringify(logObj);
           console[consoleMethod](`%c ${badge} %c ${jsonLine}`, style, 'color: inherit; font-weight: normal');
@@ -351,6 +353,12 @@ class LoggerWrapper implements Logger {
 // Export wrapped logger instance (used by patchConsoleForStructuredLogging)
 const defaultLogger = new LoggerWrapper(logger);
 export default defaultLogger;
+
+// Register the log function so fetchWithRequestId (and logOutgoingRequest) auto-log
+// outgoing requests with the same request_id sent in X-Request-ID.
+// Uses info level — these are frontend access logs and must ship in production mode.
+// Placed here (after defaultLogger) to avoid a circular import with requestId.ts.
+registerFetchLogger((message, context) => defaultLogger.info(message, context));
 
 export interface PatchConsoleOptions {
   /** Service name for log correlation (e.g. "hello-ui", "next.js"). Default "app". */

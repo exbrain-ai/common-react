@@ -42,7 +42,7 @@ export const StatsTable: React.FC<StatsTableProps> = ({ data, className = '' }) 
     {
       key: 'name',
       label: 'Name',
-      render: (value, row) => (
+      render: (_value, row) => (
         <div>
           {row.title && (
             <span className="exbrain-text-muted" style={{ marginRight: '4px' }}>

@@ -36,6 +36,7 @@ export {
   getOrCreateClientRequestId,
   getRequestIdHeader,
   fetchWithRequestId,
+  logOutgoingRequest,
   REQUEST_ID_COOKIE_NAME,
   REQUEST_ID_HEADER,
 } from './utils/requestId';
@@ -47,5 +48,3 @@ export { useAuth0, getAccessToken } from './services/auth0';
 export * from './types/common';
 export * from './types/auth0';
 
-// Export styles
-import './styles/index.css';
