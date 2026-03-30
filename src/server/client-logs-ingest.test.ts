@@ -15,12 +15,12 @@ describe("createClientLogsPostHandler", () => {
     writeSpy?.mockRestore();
   });
 
-  it("returns 200 when body has requestId and logs array", async () => {
+  it("returns 200 when body has browserId and logs array", async () => {
     const req = new Request("http://localhost/api/logs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        requestId: "req-1",
+        browserId: "b-1",
         logs: [{ level: "info", message: "test" }],
         url: "http://localhost/",
       }),
@@ -31,12 +31,12 @@ describe("createClientLogsPostHandler", () => {
     expect(data.success).toBe(true);
   });
 
-  it("returns 200 using X-Request-ID header when body has no requestId", async () => {
+  it("returns 200 using X-Browser-ID header when body has no browserId", async () => {
     const req = new Request("http://localhost/api/logs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Request-ID": "header-id",
+        "X-Browser-ID": "header-browser-id",
       },
       body: JSON.stringify({ logs: [], url: "" }),
     });
@@ -46,14 +46,14 @@ describe("createClientLogsPostHandler", () => {
     expect(data.success).toBe(true);
   });
 
-  it("returns 200 using x-request-id header when body has no requestId and X-Request-ID absent", async () => {
+  it("uses browser_id field in output from browserId body field", async () => {
     const req = new Request("http://localhost/api/logs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-request-id": "  low-id  ",
       },
       body: JSON.stringify({
+        browserId: "b-from-body",
         logs: [{ level: "info", message: "ping" }],
         url: "",
       }),
@@ -62,7 +62,7 @@ describe("createClientLogsPostHandler", () => {
     expect(res.status).toBe(200);
     expect(writeSpy).toHaveBeenCalled();
     const written = String(writeSpy?.mock.calls[0]?.[0] ?? "");
-    expect(written).toContain('"request_id":"low-id"');
+    expect(written).toContain('"browser_id":"b-from-body"');
   });
 
   it("normalizes log entry message and merges object context", async () => {
@@ -70,7 +70,7 @@ describe("createClientLogsPostHandler", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        requestId: "r1",
+        browserId: "b-1",
         logs: [
           { level: "warn", message: 123, context: { extra: "x" } },
           { level: "info", message: "ok", context: null },
@@ -82,6 +82,40 @@ describe("createClientLogsPostHandler", () => {
     const lines = (writeSpy?.mock.calls ?? []).map((c) => String(c[0]));
     expect(lines.some((l) => l.includes('"message":"—"') && l.includes('"extra":"x"'))).toBe(true);
     expect(lines.some((l) => l.includes('"message":"ok"'))).toBe(true);
+  });
+
+  it("uses per-entry request_id from entry context", async () => {
+    const req = new Request("http://localhost/api/logs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        browserId: "b-1",
+        logs: [{ level: "info", message: "test", context: { requestId: "r-1" } }],
+        url: "",
+      }),
+    });
+    await POST(req);
+    expect(writeSpy).toHaveBeenCalled();
+    const written = String(writeSpy?.mock.calls[0]?.[0] ?? "");
+    expect(written).toContain('"request_id":"r-1"');
+    expect(written).toContain('"browser_id":"b-1"');
+  });
+
+  it("omits request_id field when entry has no requestId in context", async () => {
+    const req = new Request("http://localhost/api/logs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        browserId: "b-2",
+        logs: [{ level: "info", message: "no-rid" }],
+        url: "",
+      }),
+    });
+    await POST(req);
+    expect(writeSpy).toHaveBeenCalled();
+    const written = String(writeSpy?.mock.calls[0]?.[0] ?? "");
+    expect(written).not.toContain('"request_id"');
+    expect(written).toContain('"browser_id":"b-2"');
   });
 
   it("returns 400 when body is invalid JSON", async () => {

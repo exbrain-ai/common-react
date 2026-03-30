@@ -40,6 +40,9 @@ export type ResponseWithRequestIdCookie = {
 /** Default cookie name; must match `REQUEST_ID_COOKIE_NAME` in `utils/requestId.ts`. */
 export const DEFAULT_REQUEST_ID_COOKIE_NAME = "x-request-id";
 
+/** Default cookie name for browser ID; must match `BROWSER_ID_COOKIE_NAME` in `utils/requestId.ts`. */
+export const DEFAULT_BROWSER_ID_COOKIE_NAME = "x-browser-id";
+
 function generateFallbackRequestId(): string {
   return typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
@@ -76,6 +79,20 @@ export type ApplyRequestIdToNextResponseOptions = {
   secure?: boolean;
 };
 
+function parseCookieValue(cookieHeader: string, name: string): string {
+  const parts = cookieHeader.split(";");
+  for (const part of parts) {
+    const trimmed = part.trim();
+    const eq = trimmed.indexOf("=");
+    if (eq < 0) continue;
+    const cookieName = trimmed.slice(0, eq).trim();
+    if (cookieName === name) {
+      return trimmed.slice(eq + 1).trim();
+    }
+  }
+  return "";
+}
+
 /**
  * Sets `X-Request-ID` on the response and the visible `x-request-id` cookie (httpOnly: false).
  * @returns The request ID applied (for optional edge logging).
@@ -101,4 +118,35 @@ export function applyRequestIdToNextResponse(
     path,
   });
   return requestId;
+}
+
+/**
+ * Sets `X-Browser-ID` on the response and the visible `x-browser-id` cookie (httpOnly: false).
+ * Reads existing browser ID from the incoming Cookie header and reuses it if valid,
+ * otherwise generates a new UUID. This is a stable observability correlator, not related to auth.
+ * @returns The browser ID applied.
+ */
+export function applyBrowserIdToNextResponse(
+  request: RequestIdSource,
+  response: ResponseWithRequestIdCookie,
+  options?: ApplyRequestIdToNextResponseOptions,
+): string {
+  const cookieName = options?.cookieName ?? DEFAULT_BROWSER_ID_COOKIE_NAME;
+  const cookieHeader = request.headers.get("cookie") ?? "";
+  const existing = parseCookieValue(cookieHeader, cookieName);
+  const browserId = existing && isValidUuid(existing) ? existing : generateFallbackRequestId();
+  const maxAge = options?.maxAgeSeconds ?? 3600;
+  const path = options?.path ?? "/";
+  const secure = options?.secure ?? false;
+  const sameSite = options?.sameSite ?? "lax";
+
+  response.headers.set("X-Browser-ID", browserId);
+  response.cookies.set(cookieName, browserId, {
+    httpOnly: false,
+    secure,
+    sameSite,
+    maxAge,
+    path,
+  });
+  return browserId;
 }

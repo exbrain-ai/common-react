@@ -60,7 +60,7 @@ export function getClientIP(headers: Headers | Record<string, string | null>): s
     const forwardedFor = headers.get('x-forwarded-for');
     if (forwardedFor) {
       // X-Forwarded-For can contain multiple IPs, take the first one
-      return forwardedFor.split(',')[0].trim();
+      return forwardedFor.split(',')[0]?.trim() ?? '';
     }
     return headers.get('x-real-ip') || '';
   } else {
@@ -68,7 +68,7 @@ export function getClientIP(headers: Headers | Record<string, string | null>): s
     const forwardedFor = headers['x-forwarded-for'] || headers['X-Forwarded-For'];
     if (forwardedFor) {
       // X-Forwarded-For can contain multiple IPs, take the first one
-      return String(forwardedFor).split(',')[0].trim();
+      return String(forwardedFor).split(',')[0]?.trim() ?? '';
     }
     return String(headers['x-real-ip'] || headers['X-Real-IP'] || '');
   }

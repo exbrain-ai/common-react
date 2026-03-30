@@ -27,7 +27,7 @@ describe('requestId', () => {
     it('prefers cookie over session fallback', async () => {
       Object.defineProperty(document, 'cookie', {
         writable: true,
-        value: 'x-request-id=from-cookie',
+        value: 'x-browser-id=from-cookie',
         configurable: true,
       });
       const { getOrCreateClientRequestId } = await import('./requestId');
@@ -35,25 +35,38 @@ describe('requestId', () => {
     });
   });
 
+  describe('getOrCreateClientBrowserId', () => {
+    it('returns stable id across calls when cookie absent', async () => {
+      const { getOrCreateClientBrowserId } = await import('./requestId');
+      const a = getOrCreateClientBrowserId();
+      const b = getOrCreateClientBrowserId();
+      expect(a).toBe(b);
+      expect(a).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    });
+
+    it('prefers x-browser-id cookie over session fallback', async () => {
+      Object.defineProperty(document, 'cookie', {
+        writable: true,
+        value: 'x-browser-id=browser-cookie',
+        configurable: true,
+      });
+      const { getOrCreateClientBrowserId } = await import('./requestId');
+      expect(getOrCreateClientBrowserId()).toBe('browser-cookie');
+    });
+  });
+
   describe('getRequestIdHeader', () => {
-    it('returns same X-Request-ID on repeated calls when cookie absent (browser)', async () => {
+    it('returns different X-Request-ID on repeated calls when cookie absent (browser)', async () => {
       const { getRequestIdHeader } = await import('./requestId');
       const h1 = getRequestIdHeader() as Record<string, string>;
       const h2 = getRequestIdHeader() as Record<string, string>;
-      expect(h1['X-Request-ID']).toBe(h2['X-Request-ID']);
       expect(h1['X-Request-ID']).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       );
-    });
-
-    it('uses cookie value when present', async () => {
-      Object.defineProperty(document, 'cookie', {
-        writable: true,
-        value: 'x-request-id=hdr-cookie',
-        configurable: true,
-      });
-      const { getRequestIdHeader } = await import('./requestId');
-      expect(getRequestIdHeader()).toEqual({ 'X-Request-ID': 'hdr-cookie' });
+      expect(h2['X-Request-ID']).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      );
+      expect(h1['X-Request-ID']).not.toBe(h2['X-Request-ID']);
     });
 
     it('returns empty object when session id is unavailable (no crypto)', async () => {
@@ -83,6 +96,28 @@ describe('requestId', () => {
     });
   });
 
+  describe('getBrowserIdHeader', () => {
+    it('returns X-Browser-ID from cookie', async () => {
+      Object.defineProperty(document, 'cookie', {
+        writable: true,
+        value: 'x-browser-id=test-browser-id',
+        configurable: true,
+      });
+      const { getBrowserIdHeader } = await import('./requestId');
+      expect(getBrowserIdHeader()).toEqual({ 'X-Browser-ID': 'test-browser-id' });
+    });
+
+    it('returns empty object when not in browser', async () => {
+      vi.resetModules();
+      const prevDoc = globalThis.document;
+      // @ts-expect-error test SSR branch
+      delete globalThis.document;
+      const { getBrowserIdHeader } = await import('./requestId');
+      expect(getBrowserIdHeader()).toEqual({});
+      globalThis.document = prevDoc;
+    });
+  });
+
   describe('getRequestId', () => {
     it('returns raw cookie value when decodeURIComponent fails', async () => {
       Object.defineProperty(document, 'cookie', {
@@ -96,10 +131,10 @@ describe('requestId', () => {
   });
 
   describe('fetchWithRequestId', () => {
-    it('merges X-Request-ID into request headers', async () => {
+    it('merges X-Request-ID (fresh) and X-Browser-ID (cookie) into request headers', async () => {
       Object.defineProperty(document, 'cookie', {
         writable: true,
-        value: 'x-request-id=fetch-rid',
+        value: 'x-browser-id=fetch-rid',
         configurable: true,
       });
       const fetchMock = vi.fn().mockResolvedValue(new Response());
@@ -114,7 +149,10 @@ describe('requestId', () => {
       );
       const init = fetchMock.mock.calls[0][1] as RequestInit;
       const h = new Headers(init.headers);
-      expect(h.get('X-Request-ID')).toBe('fetch-rid');
+      expect(h.get('X-Browser-ID')).toBe('fetch-rid');
+      expect(h.get('X-Request-ID')).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      );
       vi.unstubAllGlobals();
     });
   });

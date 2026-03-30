@@ -9,6 +9,7 @@ export const LOG_SCHEMA_FIELDS = {
   timestamp: 'timestamp',
   service: 'service',
   request_id: 'request_id',
+  browser_id: 'browser_id',
 } as const;
 
 export type LogSchemaFieldName = keyof typeof LOG_SCHEMA_FIELDS;
