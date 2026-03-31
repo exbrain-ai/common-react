@@ -7,8 +7,7 @@
  *   import { createServerLogger } from '@exbrain/common-react/server/server-logger';
  *   export const { withRequestContext, ...logger } = createServerLogger('my-service');
  *
- * In API routes:
- *   import { withRequestContext } from '@/lib/logging/server-logger';
+ * In API routes, import from your app's per-app wrapper (e.g. app/lib/logging/server-logger.ts):
  *   import { getOrCreateRequestId } from '@exbrain/common-react/server';
  *   const log = withRequestContext(getOrCreateRequestId(request.headers), tenantId);
  *   log.info('User action', { user_id: userId, operation: 'create' });
@@ -17,7 +16,6 @@
  */
 
 // Use the dedicated /logger export path (avoids importing React components from main index).
-// @ts-expect-error - TypeScript resolves the compiled dist via package.json exports at runtime.
 import logger, { LOG_SCHEMA_FIELDS } from '../utils/logger';
 import { registerLogger } from './log-level-manager';
 
