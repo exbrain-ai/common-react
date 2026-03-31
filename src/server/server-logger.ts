@@ -17,7 +17,7 @@
  */
 
 // Use the dedicated /logger export path (avoids importing React components from main index).
-// @ts-ignore - TypeScript resolves the compiled dist via package.json exports at runtime.
+// @ts-expect-error - TypeScript resolves the compiled dist via package.json exports at runtime.
 import logger, { LOG_SCHEMA_FIELDS } from '../utils/logger';
 import { registerLogger } from './log-level-manager';
 
