@@ -29,6 +29,21 @@
       "import": "./src/server/client-logs-ingest.ts",
       "default": "./src/server/client-logs-ingest.ts"
     },
+    "./server/edge-logger": {
+      "types": "./src/server/edge-logger.ts",
+      "import": "./src/server/edge-logger.ts",
+      "default": "./src/server/edge-logger.ts"
+    },
+    "./server/log-level-manager": {
+      "types": "./src/server/log-level-manager.ts",
+      "import": "./src/server/log-level-manager.ts",
+      "default": "./src/server/log-level-manager.ts"
+    },
+    "./server/server-logger": {
+      "types": "./src/server/server-logger.ts",
+      "import": "./src/server/server-logger.ts",
+      "default": "./src/server/server-logger.ts"
+    },
     "./logger": {
       "types": "./dist/logger.d.ts",
       "import": "./dist/logger.esm.js",
