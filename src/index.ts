@@ -27,6 +27,8 @@ export { default as logger } from './utils/logger';
 export type { Logger, LogLevel } from './utils/logger';
 export * from './utils/sanitizer';
 export * from './utils/paths';
+export * from './utils/email-validator';
+export * from './utils/return-url-validator';
 export * from './utils/password-validator';
 export * from './utils/auth-error-mapper';
 export * from './utils/auth-events';
