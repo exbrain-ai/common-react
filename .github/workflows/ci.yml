@@ -128,6 +128,10 @@ jobs:
       - name: Build
         run: npm run build
 
+  trivy:
+    name: Trivy FS Scan
+    uses: exbrain-ai/common-go/.github/workflows/trivy.yml@main
+
   all-checks:
     name: All Checks Summary
     runs-on: ubuntu-latest
@@ -138,6 +142,7 @@ jobs:
       - lint
       - test
       - build
+      - trivy
     if: always()
     steps:
       - name: Evaluate results
@@ -150,6 +155,7 @@ jobs:
           check "${{ needs.lint.result }}"          "Lint"
           check "${{ needs.test.result }}"          "Test"
           check "${{ needs.build.result }}"         "Build"
+          check "${{ needs.trivy.result }}"         "Trivy FS Scan"
 
           if [ ${#FAILED[@]} -gt 0 ]; then
             echo "❌ Failed checks: ${FAILED[*]}"
