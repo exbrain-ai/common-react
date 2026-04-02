@@ -39,7 +39,7 @@ export function validateReturnUrl(
   // Reject path traversal
   if (trimmed.includes('../')) return defaultUrl;
 
-  // NOSONAR: intentional control-character rejection for open-redirect defence; range is correct and bounded
+  // eslint-disable-next-line no-control-regex -- intentional: rejects ASCII control characters for open-redirect defence
   if (/[\x00-\x1F\x7F]/.test(trimmed)) return defaultUrl;
 
   return trimmed;
