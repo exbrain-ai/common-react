@@ -122,6 +122,16 @@ libraries:
     category: Testing & Quality
     description: Jest TypeScript definitions
 
+  - name: vitest-axe
+    version: "^0.1.0"
+    category: Testing & Quality
+    description: Accessibility testing with axe-core for Vitest (WCAG 2.1 AA automated checks)
+
+  - name: axe-core
+    version: "^4.0.0"
+    category: Testing & Quality
+    description: Accessibility testing engine (peer dependency of vitest-axe)
+
   # Performance & Monitoring
   - name: web-vitals
     version: v2.1.4
