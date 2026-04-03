@@ -41,7 +41,7 @@ export function createServerLogger(service: string) {
       [LOG_SCHEMA_FIELDS.service]: service,
     };
     if (tenantId) {
-      baseContext['tenant_id'] = tenantId;
+      baseContext[LOG_SCHEMA_FIELDS.tenant_id] = tenantId;
     }
     return {
       debug: (message: string, context?: Record<string, unknown>) =>
