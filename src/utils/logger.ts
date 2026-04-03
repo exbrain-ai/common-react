@@ -80,64 +80,59 @@ class ClientLogShipper {
   }
 
   /**
-   * Flush logs to backend endpoint (fire-and-forget)
+   * Build the JSON payload for a log batch.
+   * batchRequestId is in the body for all transports; also used as X-Request-ID header on fetch paths.
+   */
+  private buildBatchPayload(batch: typeof this.logQueue): { payload: string; batchRequestId: string } {
+    const browserId = getOrCreateClientBrowserId();
+    // Batch request ID: `00000000-xxxx-...` prefix marks it as a batch transport ID in Grafana/Loki.
+    const batchRequestId = createBatchRequestId();
+    const payload = JSON.stringify({
+      browserId: browserId || undefined,
+      batchRequestId: batchRequestId || undefined,
+      logs: batch,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    });
+    return { payload, batchRequestId };
+  }
+
+  /**
+   * Flush logs via fetch with keepalive and X-Request-ID header.
+   * Used for periodic/threshold flushes while the page is alive — sets X-Request-ID on the wire
+   * so gateway access logs can correlate log-shipping POSTs with other service logs.
    */
   private async flush(): Promise<void> {
     if (this.logQueue.length === 0) {
       return;
     }
 
-    // Clear timer
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
       this.flushTimer = null;
     }
 
-    // Get current batch
     const batch = [...this.logQueue];
     this.logQueue = [];
 
-    // Browser ID for correlation (stable session correlator; body only — sendBeacon has no headers)
-    const browserId = getOrCreateClientBrowserId();
-    // Batch request ID: `00000000-xxxx-...` prefix marks it as a batch transport ID in Grafana/Loki.
-    // Included in body (works for both sendBeacon and fetch) and in X-Request-ID header (fetch only).
-    const batchRequestId = createBatchRequestId();
+    const { payload, batchRequestId } = this.buildBatchPayload(batch);
 
     try {
-      // Send to backend endpoint (fire-and-forget)
-      // Include browserId and batchRequestId in body (sendBeacon does not support custom headers)
-      const payload = JSON.stringify({
-        browserId: browserId || undefined,
-        batchRequestId: batchRequestId || undefined,
-        logs: batch,
-        userAgent: navigator.userAgent,
-        url: window.location.href,
+      fetch(this.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getBrowserIdHeader(),
+          ...(batchRequestId ? { 'X-Request-ID': batchRequestId } : {}),
+        },
+        body: payload,
+        keepalive: true,
+      }).catch((err: unknown) => {
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
+          console.warn('[logger] Failed to ship logs to server:', err);
+        }
       });
-
-      // Try sendBeacon first (more reliable, works during page unload)
-      if (navigator.sendBeacon) {
-        const blob = new Blob([payload], { type: 'application/json' });
-        navigator.sendBeacon(this.endpoint, blob);
-      } else {
-        // Fallback to fetch (may fail during page unload)
-        fetch(this.endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getBrowserIdHeader(),
-            ...(batchRequestId ? { 'X-Request-ID': batchRequestId } : {}),
-          },
-          body: payload,
-          keepalive: true, // Keep request alive even if page unloads
-        }).catch((err: unknown) => {
-          // Silently fail - logging should never break the app
-          if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
-            console.warn('[logger] Failed to ship logs to server:', err);
-          }
-        });
-      }
     } catch (error) {
-      // Silently fail - logging should never break the app
       if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
         console.warn('[logger] Failed to ship logs:', error);
       }
@@ -145,12 +140,40 @@ class ClientLogShipper {
   }
 
   /**
-   * Force flush remaining logs (call on page unload)
+   * Force flush remaining logs using sendBeacon (safe during page unload).
+   * sendBeacon cannot set custom headers; batchRequestId travels in the body only.
+   * Falls back to fetch+keepalive on browsers without sendBeacon support.
    */
   forceFlush(): void {
-    if (this.logQueue.length > 0) {
-      // Use sendBeacon for immediate flush (works during page unload)
-      this.flush();
+    if (this.logQueue.length === 0) {
+      return;
+    }
+
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+
+    const batch = [...this.logQueue];
+    this.logQueue = [];
+
+    const { payload } = this.buildBatchPayload(batch);
+
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(this.endpoint, blob);
+      } else {
+        // Fallback: fetch+keepalive on browsers without sendBeacon
+        fetch(this.endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getBrowserIdHeader() },
+          body: payload,
+          keepalive: true,
+        }).catch(() => { /* silently fail during unload */ });
+      }
+    } catch {
+      // Silently fail — logging should never break the app
     }
   }
 }
