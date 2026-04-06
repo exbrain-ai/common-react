@@ -41,6 +41,12 @@ function getLogShippingEndpoint(): string | null {
 /**
  * Client-side log batching and shipping
  * Batches logs and sends them to the configured endpoint (when set).
+ *
+ * Shipping is **disabled by default** in the browser. Consuming apps must call
+ * `enableLogShipping()` after confirming an authenticated session so that
+ * unauthenticated requests don't hit ForwardAuth-protected endpoints (see #184).
+ * While disabled, logs accumulate in the queue (up to MAX_QUEUE_SIZE) and are
+ * flushed as a backlog once shipping is enabled.
  */
 class ClientLogShipper {
   private logQueue: Array<{
@@ -52,21 +58,55 @@ class ClientLogShipper {
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly BATCH_SIZE = 10;
   private readonly FLUSH_INTERVAL_MS = 5000; // 5 seconds
+  private readonly MAX_QUEUE_SIZE = 200;
   private readonly endpoint: string;
+  private _enabled = false;
+
   constructor(endpoint: string) {
     this.endpoint = endpoint;
+  }
+
+  /** Enable log shipping (call after auth session is confirmed). Flushes backlog. */
+  enable(): void {
+    this._enabled = true;
+    if (this.logQueue.length > 0) {
+      this.flush();
+    }
+  }
+
+  /** Disable log shipping (call on logout). Clears pending timer but keeps queued logs. */
+  disable(): void {
+    this._enabled = false;
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+  }
+
+  isEnabled(): boolean {
+    return this._enabled;
   }
 
   /**
    * Add log to queue and schedule flush if needed
    */
   addLog(level: LogLevel, message: string, context?: Record<string, unknown>): void {
+    // Cap queue size to prevent unbounded memory growth while shipping is disabled
+    if (this.logQueue.length >= this.MAX_QUEUE_SIZE) {
+      this.logQueue.shift();
+    }
+
     this.logQueue.push({
       level,
       message,
       context,
       timestamp: new Date().toISOString(),
     });
+
+    // Only schedule/trigger flush when shipping is enabled
+    if (!this._enabled) {
+      return;
+    }
 
     // Flush immediately if batch size reached
     if (this.logQueue.length >= this.BATCH_SIZE) {
@@ -143,9 +183,10 @@ class ClientLogShipper {
    * Force flush remaining logs using sendBeacon (safe during page unload).
    * sendBeacon cannot set custom headers; batchRequestId travels in the body only.
    * Falls back to fetch+keepalive on browsers without sendBeacon support.
+   * Respects the enabled gate — does not ship when shipping is disabled.
    */
   forceFlush(): void {
-    if (this.logQueue.length === 0) {
+    if (this.logQueue.length === 0 || !this._enabled) {
       return;
     }
 
@@ -382,6 +423,42 @@ export default defaultLogger;
 // Uses info level — these are frontend access logs and must ship in production mode.
 // Placed here (after defaultLogger) to avoid a circular import with requestId.ts.
 registerFetchLogger((message, context) => defaultLogger.info(message, context));
+
+/**
+ * Enable client-side log shipping to the backend.
+ * Call this after the user's authenticated session is confirmed so that
+ * POSTs to /api/logs carry a valid session cookie and are not rejected
+ * by ForwardAuth (see bug #184).
+ *
+ * Safe to call multiple times or on the server (no-op outside browser).
+ */
+export function enableLogShipping(): void {
+  const shipper = getLogShipper();
+  if (shipper) {
+    shipper.enable();
+  }
+}
+
+/**
+ * Disable client-side log shipping (e.g., on logout).
+ * Logs continue to be written to the browser console; only network shipping stops.
+ *
+ * Safe to call multiple times or on the server (no-op outside browser).
+ */
+export function disableLogShipping(): void {
+  const shipper = getLogShipper();
+  if (shipper) {
+    shipper.disable();
+  }
+}
+
+/**
+ * Check whether client-side log shipping is currently enabled.
+ */
+export function isLogShippingEnabled(): boolean {
+  const shipper = getLogShipper();
+  return shipper ? shipper.isEnabled() : false;
+}
 
 export interface PatchConsoleOptions {
   /** Service name for log correlation (e.g. "hello-ui", "next.js"). Default "app". */
