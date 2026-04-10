@@ -55,6 +55,7 @@
       "require": "./src/utils/requestId.ts",
       "default": "./src/utils/requestId.ts"
     },
+    "./styles/tokens.css": "./dist/styles/tokens.css",
     "./styles/index.css": "./dist/styles/index.css",
     "./styles/*": "./dist/styles/*",
     "./utils/auth-events": {
