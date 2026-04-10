@@ -25,6 +25,8 @@ export { ProtectedRoute } from './components/auth/ProtectedRoute';
 // Export all utilities
 export { default as logger, enableLogShipping, disableLogShipping, isLogShippingEnabled } from './utils/logger';
 export type { Logger, LogLevel } from './utils/logger';
+export { createContextLogger } from './utils/context-logger';
+export type { ContextLogger } from './utils/context-logger';
 export * from './utils/sanitizer';
 export * from './utils/paths';
 export * from './utils/email-validator';
