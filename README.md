@@ -8,6 +8,7 @@ This package provides a comprehensive design system and shared components for Re
 
 - **Design System**: CSS variables, base styles, and component styles
 - **Reusable Components**: Button, Input, Table, StatusBanner, and more
+- **Responsive**: `useMediaQuery`, `useIsMobile`, Tailwind-aligned `MEDIA_*` breakpoints (SSR-safe)
 - **Utilities**: Logging, sanitization, and common helper functions
 - **TypeScript Support**: Full type definitions for all components and utilities
 
@@ -79,6 +80,25 @@ const response = await fetchWithTimeout(iamUrl, { requestId, method: 'GET' });
 ```
 
 See **docs/REQUEST_ID.md** in common-go for the full flow (Go services, gateway, React).
+
+### Viewport and responsive hooks
+
+SSR-safe `matchMedia` via `useSyncExternalStore`. Use for **structural** branches (e.g. cards vs table); prefer CSS for spacing and visibility-only changes.
+
+```tsx
+import {
+  useMediaQuery,
+  useIsMobile,
+  MEDIA_MD_UP,
+  MEDIA_XL_UP,
+} from '@exbrain/common-react';
+
+const isDesktop = useMediaQuery(MEDIA_MD_UP); // server: false (narrow-first)
+const isMobile = useIsMobile(); // server: true (mobile-first)
+const isXl = useMediaQuery(MEDIA_XL_UP);
+```
+
+Details and Tailwind alignment: `src/responsive/README.md`.
 
 ### Using Utilities
 

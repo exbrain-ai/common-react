@@ -45,6 +45,9 @@ export {
   REQUEST_ID_HEADER,
 } from './utils/requestId';
 
+// Responsive (SSR-safe viewport queries; align with Tailwind `screens`)
+export * from './responsive';
+
 // Export Auth0 service
 export { useAuth0, getAccessToken } from './services/auth0';
 
