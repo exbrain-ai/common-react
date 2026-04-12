@@ -10,7 +10,8 @@ export type { TableColumn };
 export const Table = <T extends object>({
   data,
   columns,
-  emptyMessage = 'No data available',
+  emptyMessage,
+  loadingMessage,
   loading = false,
   sortable = false,
   onSort,
@@ -54,7 +55,7 @@ export const Table = <T extends object>({
       <div className={`exbrain-table-container ${className}`}>
         <div className="exbrain-table-empty">
           <div className="exbrain-spinner" />
-          <span style={{ marginLeft: '8px' }}>Loading...</span>
+          <span style={{ marginLeft: '8px' }}>{loadingMessage}</span>
         </div>
       </div>
     );

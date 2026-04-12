@@ -48,6 +48,25 @@ export {
 // Responsive (SSR-safe viewport queries; align with Tailwind `screens`)
 export * from './responsive';
 
+// i18n (framework-neutral — no Next.js imports)
+export {
+  LOCALE_REGISTRY,
+  type LocaleEntry,
+  type SupportedLocale,
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  parseLocale,
+  dirForLocale,
+  langAttribute,
+} from './utils/i18n';
+export {
+  type TranslationFn,
+  type I18nContextValue,
+  useI18n,
+  I18nProvider,
+  createFixtureI18n,
+} from './utils/i18n-context';
+
 // Export Auth0 service
 export { useAuth0, getAccessToken } from './services/auth0';
 

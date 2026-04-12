@@ -10,6 +10,8 @@ export function StatusBanner({
   message,
   onRetry,
   retryLoading = false,
+  retryLabel,
+  retryLoadingLabel,
   dismissible = false,
   onDismiss,
   className = '',
@@ -44,7 +46,7 @@ export function StatusBanner({
               className="exbrain-button exbrain-button--small exbrain-button--secondary"
               aria-label="Retry action"
             >
-              {retryLoading ? 'Retrying...' : 'Retry'}
+              {retryLoading ? retryLoadingLabel : retryLabel}
             </button>
           )}
           {dismissible && onDismiss && (
