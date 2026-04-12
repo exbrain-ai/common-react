@@ -513,6 +513,14 @@ libraries:
       common-react exposes framework-neutral types and helpers without importing next-intl directly.
       No additional peer dependencies beyond next and react (already approved).
 
+  - name: "@swc/helpers"
+    version: "^0.5.21"
+    category: Internationalization
+    description: SWC runtime helpers required as peer dependency by @swc/core, which is pulled in transitively by next-intl
+    justification: >
+      Transitive peer dependency of next-intl → @swc/core (>=0.5.17). Declared explicitly in hello/ui devDependencies
+      to satisfy npm ci lock file requirements. No direct usage in application code.
+
   # Build / Lint (exbrain-ui)
   - name: "@biomejs/biome"
     version: "^1.0.0"
