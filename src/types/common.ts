@@ -35,7 +35,10 @@ export interface TableColumn<T = unknown> {
 export interface TableProps<T = unknown> extends BaseComponentProps {
   data: T[];
   columns: TableColumn<T>[];
-  emptyMessage?: string;
+  /** Required: provide a translated empty-state message. */
+  emptyMessage: string;
+  /** Required: provide a translated loading message. */
+  loadingMessage: string;
   loading?: boolean;
   sortable?: boolean;
   onSort?: (key: string, direction: 'asc' | 'desc') => void;
@@ -46,6 +49,10 @@ export interface StatusBannerProps extends BaseComponentProps {
   message: string;
   onRetry?: () => void;
   retryLoading?: boolean;
+  /** Required when onRetry is provided: translated "Retry" label. */
+  retryLabel?: string;
+  /** Required when onRetry is provided: translated "Retrying..." label. */
+  retryLoadingLabel?: string;
   dismissible?: boolean;
   onDismiss?: () => void;
 }

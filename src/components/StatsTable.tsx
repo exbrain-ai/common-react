@@ -78,6 +78,7 @@ export const StatsTable: React.FC<StatsTableProps> = ({ data, className = '' }) 
       data={sortedData}
       columns={columns}
       emptyMessage="No statistics available yet. Submit a greeting to get started!"
+      loadingMessage="Loading statistics..."
       className={className}
     />
   );

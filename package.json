@@ -49,6 +49,11 @@
       "import": "./dist/logger.esm.js",
       "require": "./dist/logger.cjs.js"
     },
+    "./i18n": {
+      "types": "./src/utils/i18n.ts",
+      "import": "./src/utils/i18n.ts",
+      "default": "./src/utils/i18n.ts"
+    },
     "./request-id": {
       "types": "./src/utils/requestId.ts",
       "import": "./src/utils/requestId.ts",

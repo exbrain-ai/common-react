@@ -500,6 +500,19 @@ libraries:
     category: State Management
     description: Zustand state (exbrain-ui)
 
+  # Internationalization (i18n)
+  - name: next-intl
+    version: "^4.9.1"
+    category: Internationalization
+    description: Internationalization (i18n) for Next.js App Router with ICU message syntax, per-locale lazy loading, and server/client component support
+    justification: >
+      Required for hello-multi-lingual feature. next-intl is the de-facto i18n library for Next.js App Router,
+      providing locale-segment routing ([locale]/), middleware-based locale detection, ICU message formatting,
+      per-namespace lazy catalog loading, and first-class RSC support. Verified compatible with Next.js 16.x
+      (peer dep ^16.0.0) and React 19.x (peer dep ^19.0.0). Runtime dependency lives in hello/ui only;
+      common-react exposes framework-neutral types and helpers without importing next-intl directly.
+      No additional peer dependencies beyond next and react (already approved).
+
   # Build / Lint (exbrain-ui)
   - name: "@biomejs/biome"
     version: "^1.0.0"
@@ -515,8 +528,6 @@ libraries:
     version: "^0.0.0"
     category: Build Tools & Development
     description: OpenAPI client codegen (exbrain-ui)
-
-
 
 
 
