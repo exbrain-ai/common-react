@@ -45,7 +45,7 @@ const AvatarImage = React.forwardRef<
 >(({ className, alt, onLoad, onError, ...props }, ref) => {
   const { setImageLoaded } = React.useContext(AvatarContext);
   return (
-    // eslint-disable-next-line @next/next/no-img-element
+    /* Raw <img> keeps a stable DOM for tests; this library is not Next.js-specific. */
     <img
       ref={ref}
       alt={alt}
