@@ -25,15 +25,24 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id) => {
-        // Externalize dependencies
-        if (['react', 'react-dom', 'react/jsx-runtime', '@auth0/auth0-react', 'next', 'next/headers', 'next/server', 'clsx', 'tailwind-merge'].includes(id)) {
-          return true
-        }
-        // Externalize node built-ins
-        if (id.startsWith('node:')) {
-          return true
-        }
-        return false
+        const peer = [
+          'react',
+          'react-dom',
+          'react/jsx-runtime',
+          '@auth0/auth0-react',
+          'next',
+          'next/headers',
+          'next/server',
+          'clsx',
+          'tailwind-merge',
+          'class-variance-authority',
+          'lucide-react',
+          'sonner',
+        ];
+        if (peer.includes(id)) return true;
+        if (id.startsWith('@radix-ui/')) return true;
+        if (id.startsWith('node:')) return true;
+        return false;
       },
       output: {
         globals: {

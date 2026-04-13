@@ -9,6 +9,8 @@
   --radius-pill: 9999px;
   --radius-card: 0.75rem;
   --radius-input: var(--radius);
+  /** Primary control chrome; Hello uses `var(--radius)`, ExBrain often overrides to `var(--radius-pill)`. */
+  --radius-button: var(--radius);
 
   /* ── Core palette ── */
   --background: #FAFAFA;
