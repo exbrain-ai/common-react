@@ -38,6 +38,7 @@ export default defineConfig({
           'class-variance-authority',
           'lucide-react',
           'sonner',
+          'cmdk',
         ];
         if (peer.includes(id)) return true;
         if (id.startsWith('@radix-ui/')) return true;
