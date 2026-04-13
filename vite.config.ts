@@ -39,6 +39,7 @@ export default defineConfig({
           'lucide-react',
           'sonner',
           'cmdk',
+          'react-hook-form',
         ];
         if (peer.includes(id)) return true;
         if (id.startsWith('@radix-ui/')) return true;
