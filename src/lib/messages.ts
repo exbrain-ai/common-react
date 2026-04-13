@@ -13,6 +13,10 @@ export const MSG_AUTH0_PROVIDER_NOT_AVAILABLE = 'Auth0Provider is not available'
 export const MSG_MISSING_REFRESH_TOKEN =
   'Missing Refresh Token. Please clear your browser storage (localStorage) and log in again to obtain a refresh token.'
 
+// Form primitives
+export const MSG_USE_FORM_FIELD_OUTSIDE_CONTEXT =
+  'useFormField should be used within <FormField>';
+
 // Auth error mapper: default and code-to-message map
 export const MSG_AUTH_DEFAULT = 'An error occurred. Please try again.'
 

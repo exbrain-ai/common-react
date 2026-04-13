@@ -13,6 +13,7 @@ import {
 } from "react-hook-form";
 import { cn } from "../utils/cn";
 import { Label } from "./label";
+import { MSG_USE_FORM_FIELD_OUTSIDE_CONTEXT } from "../lib/messages";
 
 const Form = FormProvider;
 
@@ -48,7 +49,7 @@ const useFormField = () => {
   const fieldState = getFieldState(fieldContext.name, formState);
 
   if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>");
+    throw new Error(MSG_USE_FORM_FIELD_OUTSIDE_CONTEXT);
   }
 
   const { id } = itemContext;
