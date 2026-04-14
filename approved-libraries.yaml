@@ -1,6 +1,9 @@
 # Approved React Libraries
 # This is the source of truth for approved libraries - scripts parse this file
 # The markdown file (library-standards.mdc) is documentation that references this
+#
+# POLICY: Tailwind CSS + shadcn/Radix UI only. No CSS-in-JS (MUI, Emotion, styled-components).
+# One state manager: Redux Toolkit. No Zustand.
 
 libraries:
   # Core React & TypeScript
@@ -8,115 +11,121 @@ libraries:
     version: v18.2.0
     category: Core React & TypeScript
     description: React library
-  
+
   - name: react-dom
     version: v18.2.0
     category: Core React & TypeScript
     description: React DOM rendering
-  
+
   - name: typescript
     version: v5.9.3
     category: Core React & TypeScript
-    description: TypeScript compiler (upgraded from 4.9.5)
-  
+    description: TypeScript compiler
+
   - name: "@types/react"
     version: v18.2.0
     category: Core React & TypeScript
     description: React TypeScript definitions
-  
+
   - name: "@types/react-dom"
     version: v18.2.0
     category: Core React & TypeScript
     description: React DOM TypeScript definitions
-  
+
   - name: "@types/node"
     version: v20.19.0
     category: Core React & TypeScript
     description: Node.js TypeScript definitions
 
-  # Build Tools & Development
+  # Framework
   - name: next
-    version: v16.0.10
-    category: Build Tools & Development
-    description: Next.js 16 App Router framework (for Next.js migration feature)
-    justification: Required for Next.js migration feature. Next.js 16 App Router provides server-side rendering, file-based routing, and modern React patterns. This is the core framework for the migration from Vite SPA to Next.js. Version 16.0.10 is the latest patched version that fixes CVE-2025-66478 security vulnerability in 16.0.0.
-  
-  - name: vite
-    version: v7.1.6
-    category: Build Tools & Development
-    description: Build tool and dev server
-  
-  - name: "@vitejs/plugin-react"
-    version: v5.0.3
-    category: Build Tools & Development
-    description: Vite React plugin
-  
+    version: "^16.0.10"
+    category: Framework
+    description: Next.js 16 App Router framework
+    justification: Core framework for all ExBrain UI apps. Version 16.0.10+ patches CVE-2025-66478.
+
+  # Build Tools & Development
   - name: vitest
     version: v3.2.4
     category: Build Tools & Development
     description: Testing framework
-  
+
   - name: "@vitest/ui"
     version: v3.2.4
     category: Build Tools & Development
     description: Vitest UI
-  
+
   - name: "@vitest/coverage-v8"
     version: v3.2.4
     category: Build Tools & Development
     description: Coverage reporting
-  
+
   - name: "@next/bundle-analyzer"
     version: v15.1.0
     category: Build Tools & Development
     description: Next.js bundle analysis
-  
+
   - name: "@playwright/test"
     version: v1.57.0
     category: Build Tools & Development
     description: Playwright E2E testing
-  
+
   - name: "@tanstack/react-query-devtools"
     version: v5.62.0
     category: Build Tools & Development
     description: React Query devtools
-  
+
   - name: eslint
     version: v9.x
     category: Build Tools & Development
-    description: ESLint
-  
+    description: ESLint (hello-ui only; exbrain-ui uses Biome)
+
   - name: eslint-config-next
     version: v16.0.10
     category: Build Tools & Development
-    description: Next.js ESLint config
-  
+    description: Next.js ESLint config (hello-ui only)
+
   - name: jsdom
     version: v27.4.0
     category: Build Tools & Development
     description: DOM implementation for Node (Vitest/JSDOM)
 
+  - name: "@biomejs/biome"
+    version: "^1.0.0"
+    category: Build Tools & Development
+    description: Biome lint/format (exbrain-ui)
+
+  - name: babel-plugin-react-compiler
+    version: "^19.0.0"
+    category: Build Tools & Development
+    description: React Compiler Babel plugin (exbrain-ui)
+
+  - name: openapi-typescript-codegen
+    version: "^0.0.0"
+    category: Build Tools & Development
+    description: OpenAPI client codegen (exbrain-ui)
+
   # Testing & Quality
   - name: "@testing-library/react"
     version: v16.3.2
     category: Testing & Quality
-    description: React testing utilities (React 18/19 peer range)
-  
+    description: React testing utilities
+
   - name: "@testing-library/dom"
     version: v10.4.1
     category: Testing & Quality
     description: DOM testing utilities
-  
+
   - name: "@testing-library/jest-dom"
     version: v6.8.0
     category: Testing & Quality
     description: Jest DOM matchers
-  
+
   - name: "@testing-library/user-event"
     version: v13.5.0
     category: Testing & Quality
     description: User interaction testing
-  
+
   - name: "@types/jest"
     version: v27.5.2
     category: Testing & Quality
@@ -125,31 +134,21 @@ libraries:
   - name: vitest-axe
     version: "^0.1.0"
     category: Testing & Quality
-    description: Accessibility testing with axe-core for Vitest (WCAG 2.1 AA automated checks)
+    description: Accessibility testing with axe-core for Vitest
 
   - name: axe-core
     version: "^4.0.0"
     category: Testing & Quality
     description: Accessibility testing engine (peer dependency of vitest-axe)
 
-  # Performance & Monitoring
-  - name: web-vitals
-    version: v2.1.4
-    category: Performance & Monitoring
-    description: Web performance metrics
-  
   # Logging
   - name: pino
     version: "^10.0.0"
     category: Logging
     description: High-performance structured JSON logger for Node.js and browser
-    justification: Industry-standard structured logging library with excellent performance. Works in both server-side (Next.js API routes) and browser (React components) contexts. Outputs JSON logs compatible with Loki log aggregation. Provides async logging with minimal overhead. Pino v10+ has built-in browser support.
-  
-  - name: pino-pretty
-    version: "^13.0.0"
-    category: Logging
-    description: Pretty printer for Pino logs (development only)
-    justification: Development tool for readable log output. Used only in development mode for better debugging experience. Not included in production builds.
+    justification: >
+      Industry-standard structured logging. Works in Next.js API routes and browser.
+      Outputs JSON logs compatible with Loki. Pino v10+ has built-in browser support.
 
   # Authentication
   - name: "@auth0/auth0-react"
@@ -157,101 +156,69 @@ libraries:
     category: Authentication
     description: Official Auth0 React SDK (wrapped by @exbrain/common-react)
 
-  # Framework
-  - name: next
-    version: "^16.0.10"
-    category: Framework
-    description: Next.js 16 App Router framework
-
-  # UI Components
-  - name: "@mui/material"
-    version: "^6.0.0"
-    category: UI Components
-    description: Material-UI (MUI) component library
-  
-  - name: "@mui/icons-material"
-    version: "^6.0.0"
-    category: UI Components
-    description: Material-UI (MUI) icons library
-  
-  - name: "@emotion/react"
-    version: "^11.13.0"
-    category: UI Components
-    description: Emotion React (peer dependency for Material-UI)
-  
-  - name: "@emotion/styled"
-    version: "^11.13.0"
-    category: UI Components
-    description: Emotion Styled (peer dependency for Material-UI)
-  
-  - name: "@mui/system"
-    version: "^6.0.0"
-    category: UI Components
-    description: Material-UI system utilities (peer dependency for Material-UI)
-
-  # State Management
+  # State Management — Redux only. Zustand is NOT approved.
   - name: "@reduxjs/toolkit"
     version: "^2.2.0"
     category: State Management
-    description: Redux Toolkit for state management
-  
+    description: Redux Toolkit — canonical state manager for all ExBrain UI apps
+
   - name: react-redux
     version: "^9.1.0"
     category: State Management
-    description: React bindings for Redux (peer dependency for Redux Toolkit)
-  
+    description: React bindings for Redux
+
   - name: redux
     version: "^5.0.0"
     category: State Management
-    description: Redux core library (peer dependency for Redux Toolkit)
+    description: Redux core library (peer dependency of Redux Toolkit)
 
-  # Styling
+  # Styling — Tailwind + shadcn/Radix only. MUI/Emotion/styled-components are NOT approved.
   - name: tailwindcss
     version: "^4.0.0"
     category: Styling
     description: Tailwind CSS v4 utility-first CSS framework
-  
+
   - name: postcss
     version: "^8.4.0"
     category: Styling
-    description: PostCSS (peer dependency for Tailwind CSS)
-  
-  - name: autoprefixer
-    version: "^10.4.0"
-    category: Styling
-    description: Autoprefixer (peer dependency for Tailwind CSS)
-  
-  - name: clsx
-    version: "^2.1.0"
-    category: Styling
-    description: Utility for constructing className strings (used by common-react cn)
-  
-  - name: tailwind-merge
-    version: "^2.5.0"
-    category: Styling
-    description: Merge Tailwind CSS classes (used by common-react cn)
+    description: PostCSS (required by Tailwind CSS)
 
   - name: "@tailwindcss/postcss"
     version: "^4.0.0"
     category: Styling
-    description: Tailwind CSS v4 PostCSS plugin (required for Next.js webpack/Turbopack integration)
+    description: Tailwind CSS v4 PostCSS plugin (Next.js webpack/Turbopack integration)
+
+  - name: clsx
+    version: "^2.1.0"
+    category: Styling
+    description: Utility for constructing className strings (used by cn helper)
+
+  - name: tailwind-merge
+    version: "^2.5.0"
+    category: Styling
+    description: Merge Tailwind CSS classes without conflicts (used by cn helper)
 
   - name: class-variance-authority
     version: "^0.7.0"
     category: Styling
-    description: Utility for building type-safe component variants with Tailwind CSS (used by shadcn/ui)
+    description: Type-safe component variants with Tailwind CSS (used by shadcn/ui)
 
   - name: lucide-react
     version: "^0.400.0"
     category: Styling
-    description: Icon library for React (replaces MUI icons, used with shadcn/ui)
+    description: Icon library for React (used with shadcn/ui)
 
   - name: sonner
     version: "^1.5.0"
     category: Styling
-    description: Toast notification library for React (replaces MUI Snackbar)
+    description: Toast notification library for React
 
-  # Radix UI Primitives (used by shadcn/ui component library)
+  - name: tw-animate-css
+    version: "^1.0.0"
+    category: Styling
+    description: Tailwind CSS animation utilities
+
+  # Radix UI Primitives (shadcn/ui)
   - name: "@radix-ui/react-accordion"
     version: "^1.2.0"
     category: UI Components
@@ -262,10 +229,25 @@ libraries:
     category: UI Components
     description: Radix UI Avatar primitive (shadcn/ui)
 
+  - name: "@radix-ui/react-checkbox"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Checkbox primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-collapsible"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Collapsible primitive (shadcn/ui)
+
   - name: "@radix-ui/react-dialog"
     version: "^1.1.0"
     category: UI Components
     description: Radix UI Dialog primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-dropdown-menu"
+    version: "^2.1.0"
+    category: UI Components
+    description: Radix UI DropdownMenu primitive (shadcn/ui)
 
   - name: "@radix-ui/react-label"
     version: "^2.1.0"
@@ -282,6 +264,16 @@ libraries:
     category: UI Components
     description: Radix UI RadioGroup primitive (shadcn/ui)
 
+  - name: "@radix-ui/react-scroll-area"
+    version: "^1.2.0"
+    category: UI Components
+    description: Radix UI ScrollArea primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-select"
+    version: "^2.1.0"
+    category: UI Components
+    description: Radix UI Select primitive (shadcn/ui)
+
   - name: "@radix-ui/react-separator"
     version: "^1.1.0"
     category: UI Components
@@ -292,26 +284,41 @@ libraries:
     category: UI Components
     description: Radix UI Slot primitive (shadcn/ui asChild pattern)
 
+  - name: "@radix-ui/react-switch"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Switch primitive (shadcn/ui)
+
+  - name: "@radix-ui/react-tabs"
+    version: "^1.1.0"
+    category: UI Components
+    description: Radix UI Tabs primitive (shadcn/ui)
+
   - name: "@radix-ui/react-tooltip"
     version: "^1.1.0"
     category: UI Components
     description: Radix UI Tooltip primitive (shadcn/ui)
+
+  - name: radix-ui
+    version: "^1.0.0"
+    category: UI Components
+    description: Radix UI umbrella package (exbrain-ui)
 
   # Forms & Validation
   - name: react-hook-form
     version: "^7.53.0"
     category: Forms & Validation
     description: React Hook Form for form state management
-  
+
   - name: zod
     version: "^3.24.0"
     category: Forms & Validation
     description: TypeScript-first schema validation library
-  
+
   - name: "@hookform/resolvers"
     version: "^3.9.0"
     category: Forms & Validation
-    description: React Hook Form resolvers (for Zod integration)
+    description: React Hook Form resolvers (Zod integration)
 
   # Data Fetching
   - name: "@tanstack/react-query"
@@ -385,41 +392,6 @@ libraries:
     category: UI Components
     description: HugeIcons React (exbrain-ui)
 
-  - name: "@radix-ui/react-checkbox"
-    version: "^1.1.0"
-    category: UI Components
-    description: Radix UI Checkbox (exbrain-ui)
-
-  - name: "@radix-ui/react-collapsible"
-    version: "^1.1.0"
-    category: UI Components
-    description: Radix UI Collapsible (exbrain-ui)
-
-  - name: "@radix-ui/react-dropdown-menu"
-    version: "^2.1.0"
-    category: UI Components
-    description: Radix UI DropdownMenu (exbrain-ui)
-
-  - name: "@radix-ui/react-scroll-area"
-    version: "^1.2.0"
-    category: UI Components
-    description: Radix UI ScrollArea (exbrain-ui)
-
-  - name: "@radix-ui/react-select"
-    version: "^2.1.0"
-    category: UI Components
-    description: Radix UI Select (exbrain-ui)
-
-  - name: "@radix-ui/react-switch"
-    version: "^1.1.0"
-    category: UI Components
-    description: Radix UI Switch (exbrain-ui)
-
-  - name: "@radix-ui/react-tabs"
-    version: "^1.1.0"
-    category: UI Components
-    description: Radix UI Tabs (exbrain-ui)
-
   - name: cmdk
     version: "^1.0.0"
     category: UI Components
@@ -445,11 +417,6 @@ libraries:
     category: UI Components
     description: Next.js theme provider (exbrain-ui)
 
-  - name: radix-ui
-    version: "^1.0.0"
-    category: UI Components
-    description: Radix UI (exbrain-ui)
-
   - name: react-day-picker
     version: "^9.0.0"
     category: UI Components
@@ -468,7 +435,7 @@ libraries:
   - name: recharts
     version: "^2.0.0"
     category: UI Components
-    description: Recharts (exbrain-ui)
+    description: Recharts charting (exbrain-ui)
 
   - name: remark-gfm
     version: "^4.0.0"
@@ -485,62 +452,34 @@ libraries:
     category: UI Components
     description: Stripe SDK (exbrain-ui)
 
-  - name: tw-animate-css
-    version: "^1.0.0"
-    category: UI Components
-    description: Tailwind animate (exbrain-ui)
-
   - name: vaul
     version: "^1.0.0"
     category: UI Components
     description: Drawer component (exbrain-ui)
 
-  - name: zustand
+  # Build Tools (hello-ui specific)
+  - name: "@vitejs/plugin-react"
     version: "^5.0.0"
-    category: State Management
-    description: Zustand state (exbrain-ui)
+    category: Build Tools & Development
+    description: Vite React plugin (hello-ui storybook/tooling only)
 
-  # Internationalization (i18n)
+  # Performance & Monitoring (hello-ui)
+  - name: web-vitals
+    version: "^2.0.0"
+    category: Performance & Monitoring
+    description: Web performance metrics (hello-ui)
+
+  # Internationalization (hello-ui)
   - name: next-intl
     version: "^4.9.1"
     category: Internationalization
-    description: Internationalization (i18n) for Next.js App Router with ICU message syntax, per-locale lazy loading, and server/client component support
+    description: Internationalization (i18n) for Next.js App Router
     justification: >
-      Required for hello-multi-lingual feature. next-intl is the de-facto i18n library for Next.js App Router,
-      providing locale-segment routing ([locale]/), middleware-based locale detection, ICU message formatting,
-      per-namespace lazy catalog loading, and first-class RSC support. Verified compatible with Next.js 16.x
-      (peer dep ^16.0.0) and React 19.x (peer dep ^19.0.0). Runtime dependency lives in hello/ui only;
-      common-react exposes framework-neutral types and helpers without importing next-intl directly.
-      No additional peer dependencies beyond next and react (already approved).
+      Required for hello-multi-lingual feature. next-intl is the de-facto i18n library for
+      Next.js App Router. Runtime dependency lives in hello/ui only; common-react exposes
+      framework-neutral types and helpers without importing next-intl directly.
 
   - name: "@swc/helpers"
     version: "^0.5.21"
     category: Internationalization
-    description: SWC runtime helpers required as peer dependency by @swc/core, which is pulled in transitively by next-intl
-    justification: >
-      Transitive peer dependency of next-intl → @swc/core (>=0.5.17). Declared explicitly in hello/ui devDependencies
-      to satisfy npm ci lock file requirements. No direct usage in application code.
-
-  # Build / Lint (exbrain-ui)
-  - name: "@biomejs/biome"
-    version: "^1.0.0"
-    category: Build Tools & Development
-    description: Biome lint/format (exbrain-ui)
-
-  - name: babel-plugin-react-compiler
-    version: "^19.0.0"
-    category: Build Tools & Development
-    description: React Compiler plugin (exbrain-ui)
-
-  - name: openapi-typescript-codegen
-    version: "^0.0.0"
-    category: Build Tools & Development
-    description: OpenAPI client codegen (exbrain-ui)
-
-
-
-
-
-
-
-
+    description: SWC runtime helpers (transitive peer dep of next-intl → @swc/core, hello-ui only)
