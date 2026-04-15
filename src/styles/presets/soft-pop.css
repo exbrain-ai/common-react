@@ -1,89 +1,32 @@
-/*
-label: Soft Pop
-value: soft-pop
-*/
+/* Soft Pop theme preset — large radii, pastel accents, gentle shadows.
+ * Activated via data-theme-preset="soft-pop" on <html>. */
 
-:root[data-theme-preset="soft-pop"] {
+[data-theme-preset="soft-pop"] {
   --radius: 1rem;
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0 0 0);
-  --primary: oklch(0.5106 0.2301 276.9656);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.7038 0.123 182.5025);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.9551 0 0);
-  --muted-foreground: oklch(0.3211 0 0);
-  --accent: oklch(0.7686 0.1647 70.0804);
-  --accent-foreground: oklch(0 0 0);
-  --destructive: oklch(0.6368 0.2078 25.3313);
-  --border: oklch(0.88 0 0);
-  --input: oklch(0.5555 0 0);
-  --ring: oklch(0.7853 0.1041 274.7134);
-  --chart-1: oklch(0.5106 0.2301 276.9656);
-  --chart-2: oklch(0.7038 0.123 182.5025);
-  --chart-3: oklch(0.7686 0.1647 70.0804);
-  --chart-4: oklch(0.6559 0.2118 354.3084);
-  --chart-5: oklch(0.7227 0.192 149.5793);
-  --sidebar: oklch(0.9789 0.0082 121.6272);
-  --sidebar-foreground: oklch(0 0 0);
-  --sidebar-primary: oklch(0.5106 0.2301 276.9656);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.7686 0.1647 70.0804);
-  --sidebar-accent-foreground: oklch(0 0 0);
-  --sidebar-border: oklch(0.88 0 0);
-  --sidebar-ring: oklch(0.7853 0.1041 274.7134);
-  --background: oklch(0.9789 0.0082 121.6272);
-  --foreground: oklch(0 0 0);
-  --shadow-2xs: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.03);
-  --shadow-xs: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.03);
-  --shadow-sm: 0px 1px 2px -1px hsl(0 0% 10.1961% / 0.05);
-  --shadow: 0px 1px 2px -1px hsl(0 0% 10.1961% / 0.05);
-  --shadow-md: 0px 2px 4px -1px hsl(0 0% 10.1961% / 0.05);
-  --shadow-lg: 0px 4px 6px -1px hsl(0 0% 10.1961% / 0.05);
-  --shadow-xl: 0px 8px 10px -1px hsl(0 0% 10.1961% / 0.05);
-  --shadow-2xl: 0px 0px 0px 0px hsl(0 0% 10.1961% / 0.13);
+  --radius-pill: 9999px;
+  --radius-card: 1.25rem;
+  --radius-input: 0.75rem;
+  --radius-button: var(--radius-pill);
+  --primary: oklch(0.55 0.15 270);
+  --primary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.93 0.04 290);
+  --accent-foreground: oklch(0.3 0.08 270);
+  --ring: oklch(0.65 0.15 270);
+  --shadow-2xs: 0 1px 3px oklch(0 0 0 / 0.04);
+  --shadow-xs: 0 1px 4px oklch(0 0 0 / 0.05);
+  --shadow-sm: 0 2px 8px oklch(0 0 0 / 0.06);
+  --shadow: 0 4px 12px oklch(0 0 0 / 0.07);
+  --shadow-md: 0 6px 16px oklch(0 0 0 / 0.08);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.09);
+  --shadow-xl: 0 12px 32px oklch(0 0 0 / 0.1);
+  --shadow-2xl: 0 16px 48px oklch(0 0 0 / 0.12);
+  --tracking-normal: 0em;
 }
 
-.dark:root[data-theme-preset="soft-pop"] {
-  --background: oklch(0 0 0);
-  --foreground: oklch(1 0 0);
-  --card: oklch(0.2455 0.0217 257.2823);
-  --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.2455 0.0217 257.2823);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.6801 0.1583 276.9349);
-  --primary-foreground: oklch(0 0 0);
-  --secondary: oklch(0.7845 0.1325 181.912);
-  --secondary-foreground: oklch(0 0 0);
-  --muted: oklch(0.3211 0 0);
-  --muted-foreground: oklch(0.7921 0 0);
-  --accent: oklch(0.7686 0.1647 70.0804);
-  --accent-foreground: oklch(0 0 0);
-  --destructive: oklch(0.7044 0.1872 23.1858);
-  --border: oklch(1 0 0);
-  --input: oklch(1 0 0);
-  --ring: oklch(0.6801 0.1583 276.9349);
-  --chart-1: oklch(0.6801 0.1583 276.9349);
-  --chart-2: oklch(0.7845 0.1325 181.912);
-  --chart-3: oklch(0.7686 0.1647 70.0804);
-  --chart-4: oklch(0.6559 0.2118 354.3084);
-  --chart-5: oklch(0.7227 0.192 149.5793);
-  --sidebar: oklch(0.2455 0.0217 257.2823);
-  --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.6801 0.1583 276.9349);
-  --sidebar-primary-foreground: oklch(0 0 0);
-  --sidebar-accent: oklch(0.7686 0.1647 70.0804);
-  --sidebar-accent-foreground: oklch(0 0 0);
-  --sidebar-border: oklch(1 0 0);
-  --sidebar-ring: oklch(0.6801 0.1583 276.9349);
-  --shadow-2xs: 0px 0px 0px 0px hsl(0 0% 100% / 0.03);
-  --shadow-xs: 0px 0px 0px 0px hsl(0 0% 100% / 0.03);
-  --shadow-sm: 0px 1px 2px -1px hsl(0 0% 100% / 0.05);
-  --shadow: 0px 1px 2px -1px hsl(0 0% 100% / 0.05);
-  --shadow-md: 0px 2px 4px -1px hsl(0 0% 100% / 0.05);
-  --shadow-lg: 0px 4px 6px -1px hsl(0 0% 100% / 0.05);
-  --shadow-xl: 0px 8px 10px -1px hsl(0 0% 100% / 0.05);
-  --shadow-2xl: 0px 0px 0px 0px hsl(0 0% 100% / 0.13);
+[data-theme-preset="soft-pop"].dark {
+  --primary: oklch(0.7 0.15 270);
+  --primary-foreground: oklch(0.15 0 0);
+  --accent: oklch(0.3 0.06 280);
+  --accent-foreground: oklch(0.9 0.04 270);
+  --ring: oklch(0.6 0.12 270);
 }
