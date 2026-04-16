@@ -36,7 +36,7 @@ export const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
     >
       {loading && <div className="exbrain-spinner exbrain-spinner--small" />}
-      {children}
+      {children as React.ReactNode}
     </button>
   );
 };

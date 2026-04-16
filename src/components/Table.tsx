@@ -43,11 +43,12 @@ export const Table = <T extends object>({
     });
   }, [data, sortKey, sortDirection, sortable]);
 
-  const renderCell = (column: TableColumn<T>, row: T): React.ReactNode => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderCell = (column: TableColumn<T>, row: T): any => {
     if (column.render) {
       return column.render(row[column.key as keyof T], row);
     }
-    return row[column.key as keyof T] as React.ReactNode;
+    return row[column.key as keyof T];
   };
 
   if (loading) {
