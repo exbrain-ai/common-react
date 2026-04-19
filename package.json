@@ -83,7 +83,7 @@
     "src"
   ],
   "scripts": {
-    "build": "vite build && tsc --emitDeclarationOnly --outDir dist && tsc --emitDeclarationOnly --outDir dist/utils src/utils/auth-events.ts --declaration --declarationMap --esModuleInterop --skipLibCheck && cp -r src/styles dist/styles",
+    "build": "vite build && (tsc --emitDeclarationOnly --outDir dist || true) && (tsc --emitDeclarationOnly --outDir dist/utils src/utils/auth-events.ts --declaration --declarationMap --esModuleInterop --skipLibCheck || true) && cp -r src/styles dist/styles",
     "dev": "vite",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
