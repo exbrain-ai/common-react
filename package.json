@@ -49,6 +49,26 @@
       "import": "./dist/logger.esm.js",
       "require": "./dist/logger.cjs.js"
     },
+    "./utils/cn": {
+      "types": "./src/utils/cn.ts",
+      "import": "./src/utils/cn.ts",
+      "default": "./src/utils/cn.ts"
+    },
+    "./utils/safe-trim": {
+      "types": "./src/utils/safe-trim.ts",
+      "import": "./src/utils/safe-trim.ts",
+      "default": "./src/utils/safe-trim.ts"
+    },
+    "./utils/email-validator": {
+      "types": "./src/utils/email-validator.ts",
+      "import": "./src/utils/email-validator.ts",
+      "default": "./src/utils/email-validator.ts"
+    },
+    "./responsive": {
+      "types": "./src/responsive/index.ts",
+      "import": "./src/responsive/index.ts",
+      "default": "./src/responsive/index.ts"
+    },
     "./i18n": {
       "types": "./src/utils/i18n.ts",
       "import": "./src/utils/i18n.ts",

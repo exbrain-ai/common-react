@@ -35,6 +35,7 @@ export * from './utils/password-validator';
 export * from './utils/auth-error-mapper';
 export * from './utils/auth-events';
 export { cn } from './utils/cn';
+export { safeTrim } from './utils/safe-trim';
 export {
   getRequestId,
   getOrCreateClientRequestId,
