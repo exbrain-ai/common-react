@@ -457,6 +457,16 @@ libraries:
     category: UI Components
     description: Drawer component (exbrain-ui)
 
+  - name: "@dagrejs/dagre"
+    version: "^1.0.0"
+    category: UI Components
+    description: DAG layout algorithm for graph explorer (ELK-like) — exbrain-ui
+
+  - name: "@xyflow/react"
+    version: "^12.0.0"
+    category: UI Components
+    description: Node/edge canvas React library — powers exbrain-ui graph explorer and agent graph tab
+
   # Build Tools (hello-ui specific)
   - name: "@vitejs/plugin-react"
     version: "^5.0.0"
