@@ -1,6 +1,7 @@
 # Approved React Libraries
 # This is the source of truth for approved libraries - scripts parse this file
 # The markdown file (library-standards.mdc) is documentation that references this
+# Last sync: 2026-04-23 (integration train — PRs #35, #36)
 #
 # POLICY: Tailwind CSS + shadcn/Radix UI only. No CSS-in-JS (MUI, Emotion, styled-components).
 # One state manager: Redux Toolkit. No Zustand.
