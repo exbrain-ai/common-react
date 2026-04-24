@@ -1,7 +1,7 @@
 # Reusable workflow: run dependency-cruiser in a UI package.
 # Each app keeps its own .dependency-cruiser.cjs (app-specific rules). This workflow only runs the tool.
 #
-# Call from hello, admin-ui, exbrain-ui, or any repo with a UI that uses dependency-cruiser:
+# Call from hello, exbrain-admin-ui, exbrain-ui, or any repo with a UI that uses dependency-cruiser:
 #   jobs:
 #     lint-deps:
 #       uses: exbrain-ai/common-react/.github/workflows/dependency-cruiser.yml@main
