@@ -22,6 +22,13 @@ export interface ButtonProps extends BaseComponentProps {
   loading?: boolean;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
+  /**
+   * Optional override for the loading indicator. When `loading` is true and
+   * this prop is provided, it replaces the default neutral inline spinner.
+   * Apps with a house spinner pass it here; otherwise the default uses
+   * `currentColor` so it inherits the button's text color.
+   */
+  loadingIndicator?: React.ReactNode;
 }
 
 export interface TableColumn<T = unknown> {
