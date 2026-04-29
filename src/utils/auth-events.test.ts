@@ -22,7 +22,7 @@ describe('auth events', () => {
         appName: 'hello',
         userId: 'user-123',
         result: 'success',
-        endpoint: '/auth/password-login',
+        endpoint: '/iam/v1/login',
       };
       logAuthEvent(context);
       expect(logger.info).toHaveBeenCalledWith('Authentication event', {
@@ -30,7 +30,7 @@ describe('auth events', () => {
         appName: 'hello',
         user_id: 'user-123',
         result: 'success',
-        endpoint: '/auth/password-login',
+        endpoint: '/iam/v1/login',
       });
     });
 
@@ -42,7 +42,7 @@ describe('auth events', () => {
         result: 'failure',
         errorCode: 'invalid_credentials',
         errorMessage: 'Invalid credentials',
-        endpoint: '/auth/password-login',
+        endpoint: '/iam/v1/login',
       };
       logAuthEvent(context);
       expect(logger.error).toHaveBeenCalledWith('Authentication event', {
@@ -52,7 +52,7 @@ describe('auth events', () => {
         result: 'failure',
         errorCode: 'invalid_credentials',
         errorMessage: 'Invalid credentials',
-        endpoint: '/auth/password-login',
+        endpoint: '/iam/v1/login',
       });
     });
 
