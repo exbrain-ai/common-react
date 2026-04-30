@@ -9,6 +9,7 @@ export { FormField } from './components/FormField';
 export { Input } from './components/Input';
 export { StatusBanner } from './components/StatusBanner';
 export { Table } from './components/Table';
+export { Pagination, type PaginationProps } from './components/Pagination/Pagination';
 
 // Export specialized components
 export { GreetingForm, type GreetingFormData } from './components/GreetingForm';
