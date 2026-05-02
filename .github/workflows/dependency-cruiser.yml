@@ -29,7 +29,8 @@ jobs:
   lint-deps:
     name: Dependency Cruiser
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    # Cold `npx dependency-cruiser@latest` (install + full graph) routinely exceeds 2m on larger apps.
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
