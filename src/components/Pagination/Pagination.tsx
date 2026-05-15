@@ -80,9 +80,8 @@ export const Pagination: React.FC<PaginationProps> = ({
     >
       <div className="exbrain-pagination__status" aria-live="polite">
         <span className="exbrain-pagination__page-indicator">
-          Page {currentPage + 1} of {totalPages}
+          Page {currentPage + 1} of {totalPages} ({total} total)
         </span>
-        <span className="exbrain-pagination__total">{total} total</span>
       </div>
 
       <div className="exbrain-pagination__controls">

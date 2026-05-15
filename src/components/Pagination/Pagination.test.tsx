@@ -14,8 +14,7 @@ describe('Pagination', () => {
       <Pagination page={0} pageSize={25} total={120} onPageChange={() => {}} />,
     );
     // 120 / 25 = 5 pages
-    expect(screen.getByText('Page 1 of 5')).toBeInTheDocument();
-    expect(screen.getByText('120 total')).toBeInTheDocument();
+    expect(screen.getByText('Page 1 of 5 (120 total)')).toBeInTheDocument();
   });
 
   it('disables Previous on the first page', () => {
@@ -40,7 +39,7 @@ describe('Pagination', () => {
     );
     expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
-    expect(screen.getByText('0 total')).toBeInTheDocument();
+    expect(screen.getByText('Page 1 of 1 (0 total)')).toBeInTheDocument();
   });
 
   it('calls onPageChange with currentPage + 1 when Next is clicked', () => {
@@ -113,7 +112,7 @@ describe('Pagination', () => {
     render(
       <Pagination page={99} pageSize={25} total={50} onPageChange={() => {}} />,
     );
-    expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
+    expect(screen.getByText('Page 2 of 2 (50 total)')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
   });
 
