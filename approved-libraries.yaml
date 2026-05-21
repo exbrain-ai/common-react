@@ -383,6 +383,21 @@ libraries:
     category: UI Components
     description: Inter font (exbrain-ui)
 
+  - name: "@fontsource/geist-mono"
+    version: "^5.2.7"
+    category: UI Components
+    description: Geist Mono font (exbrain-ui)
+
+  - name: "@fontsource/geist-sans"
+    version: "^5.2.5"
+    category: UI Components
+    description: Geist Sans font (exbrain-ui)
+
+  - name: heat-graph
+    version: "^0.0.7"
+    category: UI Components
+    description: "Activity heat-map for dashboard (exbrain-ui). NOTE: pre-1.0, single-maintainer dependency — approved for skills WIP (features#203); revisit/replace if maintenance lapses."
+
   - name: "@hugeicons/core-free-icons"
     version: "^3.0.0"
     category: UI Components
