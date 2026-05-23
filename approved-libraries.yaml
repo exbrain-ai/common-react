@@ -347,6 +347,16 @@ libraries:
     category: Data Fetching
     description: Vercel AI SDK (exbrain-ui)
 
+  # Browser AI / Local Inference (exbrain-ui)
+  - name: "@huggingface/transformers"
+    version: "^4.2.0"
+    category: Browser AI / Local Inference
+    description: Client-side Transformers runtime for browser-only speech transcription enhancement.
+    justification: >
+      Backs the ExBrain dictation post-utterance enhancement path in exbrain-ui. Loaded lazily inside a Web
+      Worker and only when the dictation enhancement feature flag is enabled; audio stays in the browser and
+      no server-side transcription path is introduced.
+
   # UI Components (exbrain-ui)
   - name: "@assistant-ui/react"
     version: "^0.12.0"
