@@ -1,4 +1,5 @@
 # CI: golden check, lint, test, build, Semgrep (self-contained; no dependency on common-go).
+# AI review: PR-only after lint, using the exbrain-ci approval/reject flow from hello.
 
 name: CI
 
@@ -92,6 +93,112 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  # ai-review: inline steps — avoids cross-private-repo reusable workflow access issues.
+  # Fetches scripts/review-pr.py from exbrain-ai/.github at runtime; its criteria are
+  # exbrain-ai/.github/review-criteria.md. Runs after lint so the LLM is not spent on
+  # trivial static failures. PR-only, matching hello's approval/request-changes behavior.
+  ai-review:
+    name: AI Code Review
+    needs: [lint]
+    if: always() && github.event_name == 'pull_request' && needs.lint.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: exbrain-ai
+
+      - name: Get PR diff
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh pr diff "$PR_NUMBER" \
+            --repo "$GH_REPO" > /tmp/pr.diff 2>&1 || true
+          DIFF_SIZE=$(wc -c < /tmp/pr.diff)
+          echo "PR diff size: ${DIFF_SIZE} bytes"
+          if [ "$DIFF_SIZE" -eq 0 ]; then
+            echo "skip=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Fetch review-pr.py
+        if: env.skip != 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh api repos/exbrain-ai/.github/contents/scripts/review-pr.py \
+            --jq '.content' | base64 -d > /tmp/review-pr.py
+
+      - name: Run Claude review
+        if: env.skip != 'true'
+        id: claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          # Quote so '#' in titles is not swallowed by YAML comment rules on expansion paths.
+          PR_TITLE: '${{ github.event.pull_request.title }}'
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 /tmp/review-pr.py --diff /tmp/pr.diff --pr "$PR_NUMBER" --repo "$GH_REPO"
+
+      - name: Post review on PR
+        if: always() && env.skip != 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          VERDICT: ${{ steps.claude.outputs.verdict }}
+          REVIEW: ${{ steps.claude.outputs.review }}
+          RUN_URL: ${{ format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+
+          if [ -z "$VERDICT" ]; then
+            echo "⚠️ Claude review did not produce a verdict (API error?) — skipping PR comment."
+            exit 1
+          fi
+
+          echo "exbrain-ci: parsed verdict = ${VERDICT} (this must match the GitHub review and CI outcome)"
+          if [ "$VERDICT" = "APPROVE" ]; then
+            echo "exbrain-ci: will run: gh pr review --approve  (CI check should be green for this job)"
+          else
+            echo "exbrain-ci: will run: gh pr review --request-changes  (CI check will fail for this job by design)"
+          fi
+
+          COMMENT_BODY="<!-- exbrain-ci-ai-review -->
+          🤖 **AI Code Review** — [exbrain-ci](https://github.com/apps/exbrain-ci)
+
+          ${REVIEW}
+
+          ---
+          *CI **verdict:** \`${VERDICT}\` · [Workflow run](${RUN_URL})*
+          *If an older exbrain-ci approval still blocks the view after a new run, turn on **Dismiss stale reviews when new commits are pushed** in branch protection so a new commit clears stale reviews.*
+          *Automated review by Claude · [Review criteria](https://github.com/exbrain-ai/.github/blob/main/review-criteria.md)*
+          <!-- exbrain-ci-verdict:${VERDICT} -->"
+
+          if [ "$VERDICT" = "APPROVE" ]; then
+            gh pr review "$PR" --repo "$REPO" --approve --body "$COMMENT_BODY"
+            echo "✅ Approved (GitHub review state: APPROVE)"
+          else
+            gh pr review "$PR" --repo "$REPO" --request-changes --body "$COMMENT_BODY"
+            echo "❌ Requested changes (GitHub review state: changes requested; CI is red for this check)"
+            exit 1
+          fi
+
+      - name: Skip notice
+        if: env.skip == 'true'
+        run: echo "Empty diff — AI review skipped."
+
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -144,6 +251,7 @@ jobs:
       - semgrep
       - golden-check
       - lint
+      - ai-review
       - test
       - build
       - trivy
@@ -153,10 +261,12 @@ jobs:
         run: |
           FAILED=()
           check() { if [ "$1" != "success" ]; then FAILED+=("$2"); fi; }
+          check_optional() { if [ "$1" = "failure" ] || [ "$1" = "cancelled" ]; then FAILED+=("$2"); fi; }
 
           check "${{ needs.semgrep.result }}"       "Semgrep SAST"
           check "${{ needs.golden-check.result }}"  "Golden check"
           check "${{ needs.lint.result }}"          "Lint"
+          check_optional "${{ needs.ai-review.result }}" "AI Code Review"
           check "${{ needs.test.result }}"          "Test"
           check "${{ needs.build.result }}"         "Build"
           check "${{ needs.trivy.result }}"         "Trivy FS Scan"
