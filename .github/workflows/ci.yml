@@ -239,9 +239,30 @@ jobs:
       - name: Build
         run: npm run build
 
+  # trivy: inline steps — avoids cross-private-repo reusable workflow access
+  # issues (same reason ai-review is inlined). common-go/trivy.yml@main is scoped
+  # to "common-go, hello, iam" and common-react lacks access, so calling it
+  # startup-failed the whole workflow (0s, "workflow file issue") → the required
+  # All Checks Summary never reported. Faithful copy of trivy.yml@main's scan.
   trivy:
     name: Trivy FS Scan
-    uses: exbrain-ai/common-go/.github/workflows/trivy.yml@main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem scan
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+        run: |
+          # Pin image + force amd64: :latest can resolve to wrong arch on ubuntu-latest → exec format error.
+          docker run --rm \
+            --platform linux/amd64 \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -w /src \
+            aquasec/trivy:0.69.3 \
+            fs . --exit-code 1 --severity HIGH,CRITICAL --scanners vuln
 
   all-checks:
     name: All Checks Summary
