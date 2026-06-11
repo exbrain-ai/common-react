@@ -8,7 +8,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
-        logger: resolve(__dirname, 'src/utils/logger.ts'),
+        logger: resolve(__dirname, 'src/logger.ts'),
         'utils/auth-events': resolve(__dirname, 'src/utils/auth-events.ts'),
       },
       name: 'ReactCommon',
