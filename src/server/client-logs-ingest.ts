@@ -43,10 +43,8 @@ export function createClientLogsPostHandler(options: ClientLogsIngestOptions) {
         "";
       const logs = Array.isArray(body.logs) ? body.logs : [];
       const url = typeof body.url === "string" ? body.url : "";
-      const userAgent = typeof body.userAgent === "string" ? body.userAgent : (request.headers.get("user-agent") ?? "");
-      const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        request.headers.get("x-real-ip")?.trim() ||
-        "";
+      // PII (golden §7): do NOT persist user_agent or client_ip (from x-forwarded-for /
+      // x-real-ip). Correlation is via browser_id / request_id only.
 
       for (const entry of logs) {
         const level = (entry?.level as string) || "info";
@@ -68,8 +66,6 @@ export function createClientLogsPostHandler(options: ClientLogsIngestOptions) {
           browser_id: browserId,
           source: "browser",
           url,
-          user_agent: userAgent || undefined,
-          client_ip: clientIp || undefined,
           ...restContext,
         };
         if (entryRequestId) {

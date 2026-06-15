@@ -66,4 +66,31 @@ describe('validateReturnUrl', () => {
   it('accepts nested valid paths', () => {
     expect(validateReturnUrl('/hello/users/123?tab=profile')).toBe('/hello/users/123?tab=profile');
   });
+
+  // Backslash open-redirect vectors: browsers normalize '\' to '/', so '/\evil.com'
+  // resolves to the protocol-relative '//evil.com'.
+  it('rejects /\\evil.com (slash-backslash)', () => {
+    expect(validateReturnUrl('/\\evil.com')).toBe('/');
+  });
+
+  it('rejects /\\/evil.com', () => {
+    expect(validateReturnUrl('/\\/evil.com')).toBe('/');
+  });
+
+  it('rejects \\\\evil.com (double backslash)', () => {
+    expect(validateReturnUrl('\\\\evil.com')).toBe('/');
+  });
+
+  it('rejects backslash anywhere in the path', () => {
+    expect(validateReturnUrl('/dashboard\\evil')).toBe('/');
+  });
+
+  it('rejects percent-encoded backslash %5C', () => {
+    expect(validateReturnUrl('/%5Cevil.com')).toBe('/');
+    expect(validateReturnUrl('/%5cevil.com')).toBe('/');
+  });
+
+  it('still accepts legitimate same-origin paths with query strings', () => {
+    expect(validateReturnUrl('/dashboard/home?x=1')).toBe('/dashboard/home?x=1');
+  });
 });
