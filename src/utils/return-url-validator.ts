@@ -7,6 +7,9 @@
  * Validation rules:
  * - Same-origin only: relative paths, no scheme or host
  * - Must start with '/'
+ * - No backslash '\' anywhere (browsers normalize '\' to '/', so '/\evil.com'
+ *   becomes the protocol-relative '//evil.com' → open redirect). Also catches
+ *   percent-encoded backslash '%5C'.
  * - No '//' (double-slash) after the leading slash
  * - No '../' path traversal
  * - No ASCII control characters (0x00–0x1F, 0x7F)
@@ -26,6 +29,11 @@ export function validateReturnUrl(
   if (!returnUrl || returnUrl.trim() === '') return defaultUrl;
 
   const trimmed = returnUrl.trim();
+
+  // Reject backslashes outright. Browsers normalize '\' to '/', so a value like
+  // '/\evil.com' resolves to the protocol-relative '//evil.com' (open redirect).
+  // Also reject percent-encoded backslash ('%5C') which decodes to '\'.
+  if (trimmed.includes('\\') || /%5c/i.test(trimmed)) return defaultUrl;
 
   // Reject absolute URLs (http://, https://, //, foo://)
   if (/^(https?:\/\/|\/\/|.*:\/\/)/i.test(trimmed)) return defaultUrl;

@@ -9,7 +9,9 @@ import { Auth0Provider as Auth0ProviderBase } from '@auth0/auth0-react';
 import { ORIGIN_PREFIX_127, ORIGIN_PREFIX_LOCALHOST, URL_SCHEME_HTTPS } from '../../lib/constants';
 import { MSG_AUTH0_DISABLED_HTTP_WARN } from '../../lib/messages';
 import type { Auth0Config } from '../../types/auth0';
-import logger from '../../utils/logger';
+import { createContextLogger } from '../../utils/context-logger';
+
+const log = createContextLogger('AuthProvider');
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -82,8 +84,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
     // This is expected and correct when using IAM Service
     // IAM Service handles all OAuth flows, so Auth0 SDK is not needed
     if (process.env.NODE_ENV === 'development' && usingIAMService) {
-      console.info(
-        'ℹ️  Auth0 Provider skipped: App is using IAM Service for authentication. ' +
+      log.info(
+        'Auth0 Provider skipped: App is using IAM Service for authentication. ' +
         'IAM Service handles OAuth flows, so Auth0 SDK initialization is not needed.'
       );
     }
@@ -93,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, config }) 
   // For HTTP (non-localhost), skip Auth0 initialization
   // Auth0 requires HTTPS or localhost for Web Crypto API
   if (!secure) {
-    logger.warn(MSG_AUTH0_DISABLED_HTTP_WARN);
+    log.warn(MSG_AUTH0_DISABLED_HTTP_WARN);
     return <>{children}</>;
   }
   

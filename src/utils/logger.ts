@@ -127,12 +127,13 @@ class ClientLogShipper {
     const browserId = getOrCreateClientBrowserId();
     // Batch request ID: `00000000-xxxx-...` prefix marks it as a batch transport ID in Grafana/Loki.
     const batchRequestId = createBatchRequestId();
+    // PII (golden §7): do NOT ship userAgent. Strip the query string from the URL —
+    // query strings can carry tokens/emails — ship origin+pathname only.
     const payload = JSON.stringify({
       browserId: browserId || undefined,
       batchRequestId: batchRequestId || undefined,
       logs: batch,
-      userAgent: navigator.userAgent,
-      url: window.location.href,
+      url: window.location.origin + window.location.pathname,
     });
     return { payload, batchRequestId };
   }
