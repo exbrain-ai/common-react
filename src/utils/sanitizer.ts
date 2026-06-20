@@ -3,50 +3,41 @@
  */
 
 /**
- * Sanitizes a string by removing potentially dangerous characters
+ * Sanitizes a plaintext string. Strips only angle brackets so the value can
+ * never be read as an HTML tag, and trims. It deliberately PRESERVES legitimate
+ * text — "AT&T", "O'Brien", "José Núñez" come back unchanged (features#1374).
+ * XSS safety is output encoding (React auto-escapes; use sanitizeHTML for HTML
+ * sinks) plus the backend's strict sanitizer — never input character-stripping
+ * (golden §15.5.6).
  */
 export function sanitizeString(input: string): string {
   if (!input) {
     return '';
   }
 
-  return input
-    .replace(/[<>]/g, '') // Remove < and >
-    .replace(/[&"']/g, '') // Remove &, ", and '
-    .replace(/[/\\]/g, '') // Remove / and \
-    .trim();
+  return input.replace(/[<>]/g, '').trim();
 }
 
 /**
- * Sanitizes a name input (more restrictive)
+ * Sanitizes a plaintext name. Same data-preserving behavior as sanitizeString.
  */
 export function sanitizeName(input: string): string {
   if (!input) {
     return '';
   }
 
-  return input
-    .replace(/[<>]/g, '') // Remove < and >
-    .replace(/[&"']/g, '') // Remove &, ", and '
-    .replace(/[/\\]/g, '') // Remove / and \
-    .replace(/[^\w\s-]/g, '') // Remove special characters except word chars, spaces, and hyphens
-    .trim();
+  return input.replace(/[<>]/g, '').trim();
 }
 
 /**
- * Sanitizes a title input
+ * Sanitizes a plaintext title. Same data-preserving behavior as sanitizeString.
  */
 export function sanitizeTitle(input: string): string {
   if (!input) {
     return '';
   }
 
-  return input
-    .replace(/[<>]/g, '') // Remove < and >
-    .replace(/[&"']/g, '') // Remove &, ", and '
-    .replace(/[/\\]/g, '') // Remove / and \
-    .replace(/[^\w\s.-]/g, '') // Remove special characters except word chars, spaces, dots, and hyphens
-    .trim();
+  return input.replace(/[<>]/g, '').trim();
 }
 
 /**
