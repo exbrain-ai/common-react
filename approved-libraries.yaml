@@ -519,3 +519,65 @@ libraries:
     version: "^0.5.21"
     category: Internationalization
     description: SWC runtime helpers (transitive peer dep of next-intl → @swc/core, hello-ui only)
+
+  # Native App Shells (exbrain-ui desktop/mobile) — cyrus20
+  # Tauri (desktop) + Capacitor (mobile) wrappers around the Next.js web app, plus
+  # ogl (WebGL) for the ambient Orb. Runtime deps live in exbrain-ui only; common-react
+  # does not import any of them. Approved onto main 2026-06-24 to land Cyrus's native-app
+  # scaffolding (src-tauri/, capacitor.config.ts); not yet wired into app code.
+  - name: "@tauri-apps/api"
+    version: "^2.0.0"
+    category: Native App Shells
+    description: Tauri desktop runtime API (exbrain-ui desktop shell)
+  - name: "@tauri-apps/plugin-shell"
+    version: "^2.0.0"
+    category: Native App Shells
+    description: Tauri shell plugin
+  - name: "@tauri-apps/plugin-notification"
+    version: "^2.0.0"
+    category: Native App Shells
+    description: Tauri notification plugin
+  - name: "@tauri-apps/plugin-fs"
+    version: "^2.0.0"
+    category: Native App Shells
+    description: Tauri filesystem plugin
+  - name: "@tauri-apps/plugin-dialog"
+    version: "^2.0.0"
+    category: Native App Shells
+    description: Tauri dialog plugin
+  - name: "@tauri-apps/cli"
+    version: "^2.0.0"
+    category: Native App Shells
+    description: Tauri CLI (devDependency, desktop build tooling)
+  - name: "@capacitor/core"
+    version: "^6.0.0"
+    category: Native App Shells
+    description: Capacitor mobile runtime core (exbrain-ui mobile shell)
+  - name: "@capacitor/ios"
+    version: "^6.0.0"
+    category: Native App Shells
+    description: Capacitor iOS platform
+  - name: "@capacitor/android"
+    version: "^6.0.0"
+    category: Native App Shells
+    description: Capacitor Android platform
+  - name: "@capacitor/browser"
+    version: "^6.0.0"
+    category: Native App Shells
+    description: Capacitor in-app browser plugin
+  - name: "@capacitor/preferences"
+    version: "^6.0.0"
+    category: Native App Shells
+    description: Capacitor preferences (key-value) plugin
+  - name: "@capacitor/push-notifications"
+    version: "^6.0.0"
+    category: Native App Shells
+    description: Capacitor push notifications plugin
+  - name: "@capacitor/cli"
+    version: "^6.0.0"
+    category: Native App Shells
+    description: Capacitor CLI (devDependency, mobile build tooling)
+  - name: "ogl"
+    version: "^1.0.11"
+    category: Native App Shells
+    description: Minimal WebGL library (ambient Orb render)
